@@ -81,7 +81,7 @@
 
 % Example: \title{This is a test title}
 
-\title{Energy}
+\title{A detailed total energy analysis of the Community Atmosphere Model (CAM)}
 
 %% ------------------------------------------------------------------------ %%
 %
@@ -197,6 +197,81 @@
 
 \section{Introduction}
 \citep{LetAl2018JAMES}
+\section{Method}
+\begin{itemize}
+\item `These fixers add a uniform increment to the temperature field to compensate for the global average energy lost by the dynamical core that time step. While this ensures a global energy balance, any impact of the conservation error would be in the spatial distribution which cannot be determined.' - \citet{WOHTTV2015JAMES}
+\end{itemize}
+
+CAM-SE is formulated using a terrain-following hybrid-sigma vertical coordinate $\eta$ but the coordinate levels are defined in terms of dry air mass ($M^{(d)}$) instead of total air mass; $\eta^{(d)}$ \citep[see ][ for details]{LetAl2018JAMES}. In such a coordinate system it is convenient to define the tracer state in terms of a dry mixing ratio instead of moist mixing ratio
+\begin{equation}
+m^{(\ell)}\equiv \frac{\rho^{(\ell)}}{\rho^{(d)}}, \text{ where }\ell=`wv`,`cl`,`ci`,`rn`,`sw`,\label{eq:mx}
+\end{equation}
+where $\rho^{(d)}$ is the mass of dry air per unit volume of moist air and $\rho^{(\ell)}$ is the mass of the water substance of type $\ell$ per unit volume of moist air. Moist air refers to air containing dry air, water vapor, cloud liquid, cloud ice, rain amount and snow amount. For notational purposes define the set of all components of air
+\begin{equation}
+\mathcal{L}_{all}=\left\{ `d`,`wv`,`cl`,`ci`,`rn`,`sw`\right\},
+\end{equation}
+Define associated heat capacities at constant pressure $c_p^{(\ell)}$. Using the $\eta^{(d)}$ vertical coordinate and dry mixing ratios the total energy that the frictionless adiabatic equations of motion in the CAM-SE dynamical core conserves is 
+\begin{equation}
+E^{(dycore)}=\int_{\eta=0}^{\eta=1} \iint_\mathcal{S} \left( \frac{\partial M^{(d)}}{\partial \eta^{(d)}} \right)\sum_{\ell \in \mathcal{L}_{all}} \left[m^{(\ell)} \left(K+c_p^{(\ell)}T+\Phi_s  \right)\right]  dA d \eta^{(d)},\label{eq:comprehensice_energy}
+\end{equation}
+where $K=\frac{1}{2}\mathbf{v}\cdot \mathbf{v}$ is the kinetic energy ($\mathbf{v}$ is the wind vector) and $\Phi_s$ is the surface geopotential.
+
+In the CAM physical parameterizations a different definition of total energy is used. For the computation of total energy condensates are assumed to be zero and the heat capacity of moisture is the same as for dry air
+\begin{equation}
+E^{(physics)}=\int_{\eta=0}^{\eta=1} \iint_\mathcal{S} \left( \frac{\partial M^{(d)}}{\partial \eta^{(d)}} \right)\left(1+m^{(wv)}\right)\left[ \left(K+c_p^{(d)}T+\Phi_s\right)\right]dA d \eta^{(d)}.
+\end{equation}
+One can make the adiabatic, frictionless equations of motion in the dynamical core conserve $E^{(physics)}$ by only including water vapor in the pressure field and setting the heat capacity for moisture to $c_p^{(d)}$ \citep{T2011LNCSEb}. We will make use of this configuration in the analysis presented in this paper.
+
+Under the assumption that pressure remains constant during the computation of the subgrid-scale parameterization tendencies, the total energy budget associated with each parameterization is closed. In other words, the total energy change in the column is exactly balanced by the net sources/sinks given by the fluxes through the column. That said, if parameterizations update specific humidity then the surface pressure changes (e.g., moisture leaving the column). {\color{red}{discuss energy implications ....}} \citep[section 3.1.8 in ][]{CAM5}
+
+
+\section{Results}
+`The discrepancy between the more comprehensive energy formula \eqref{eq:comprehensice_energy} and the CAM physics formula for total energy is about 0.5 $W/m^2$ \citep{T2011LNCSEb}. By only including dry air and water vapor   in $\rho$ and setting $c_p^{(wv)}= c_p^{(d)}$ in the equations of motion, the dynamical core (in the absence of truncation errors) will conserve the energy used in CAM physics.'
+
+
+\begin{figure}[h]
+% \centering
+% when using pdflatex, use pdf file:
+
+\verb+do nt=1,ntotal+\\
+\verb+  +\\
+\verb+  PARAMETERIZATIONS:+\\
+\verb+  +\\
+\verb+  +{\color{blue}{output 'pBF'}}\\
+\verb+  +Energy fixer\\
+\verb+  +{\color{blue}{output 'pBP'}}\\
+\verb+  +Physics updates the state and state saved for energy fixer\\
+\verb+  +{\color{blue}{output 'pAP'}}\\
+\verb+  +Dry mass correction\\
+\verb+  +{\color{blue}{output 'pAM'}}\\
+\verb+  +\\
+\verb+  DYNAMICAL CORE:+\\
+\verb+  +\\
+\verb+  +{\color{blue}{output 'dED'}}\\
+\verb+  do ns=1,nsplit+\\
+\verb+    +{\color{blue}{output 'dAF'}}\\
+\verb+    Update state with physics tendencies+\\
+\verb+    +{\color{blue}{output 'dBD'}}\\
+\verb+    do nr=1,rsplit+\\
+\verb+       Advance the adiabatic frictionless equations of motion +\\
+\verb+       in floating Lagrangian layer.+\\
+\verb+       do ns=1,hypervis_subcycle+\\
+\verb+          +{\color{blue}{output 'dBH'}}\\
+\verb+          Advance hyperviscosity operators.+\\
+\verb+          +{\color{blue}{output 'dCH'}}\\
+\verb+          Add frictional heating to temperature.+\\
+\verb+          +{\color{blue}{output 'dAH'}}\\
+\verb+       end do+\\
+\verb+    end do+\\
+\verb+    +{\color{blue}{output 'dAD'}}\\
+\verb+    Vertical remapping from floating Lagrangian levels to Eulerian levels+\\
+\verb+    +{\color{blue}{output 'dAR'}}\\
+\verb+  end do+\\
+\verb+  +{\color{blue}{output 'dBF'}}\\
+\verb+end do+
+\caption{Pseudo-code ...}
+\end{figure}
+
 \section{Conclusions}\label{sec:concl}
 
 %Text here ===>>>
