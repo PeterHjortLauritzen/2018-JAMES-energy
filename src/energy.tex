@@ -102,7 +102,7 @@
 % Example: \authors{A. B. Author\affil{1}\thanks{Current address, Antartica}, B. C. Author\affil{2,3}, and D. E.
 % Author\affil{3,4}\thanks{Also funded by Monsanto.}}
 
-\authors{P.H. Lauritzen\affil{1}\thanks{1850 Table Mesa Drive, Boulder, Colodaro, USA}, and D.L. Williamson \affil{1}}
+\authors{P.H. Lauritzen\affil{1}\thanks{1850 Table Mesa Drive, Boulder, Colorado, USA}, and D.L. Williamson \affil{1}}
 
  \affiliation{1}{National Center for Atmospheric Research, Boulder, Colorado, USA}
 % \affiliation{2}{School of Marine and Atmospheric Sciences, Stony Brook University, State University of New York, Stony Brook, New York}
@@ -196,35 +196,84 @@
 
 
 \section{Introduction}
-\citep{LetAl2018JAMES}
+In coupled climate modeling with prognostic atmosphere, ocean, land, land-ice, and sea-ice components, it is important to conserve total energy to a high degree to avoid spurious long term trends in the simulated Earth system. Conservation of total energy in this context refers to having a closed total energy budget. For example, the total energy change in a column in the atmosphere is exactly balanced by the net sources/sinks given by the fluxes through the column. The fluxes into the atmospheric component from the surface models must be balanced by the fluxes in the respective surface components and so on. Henceforth we will focus only on the atmospheric component which, in a numerical model, is split into a resolved-scale component (the dynamical core) and a sub-grid-scale component (parameterizations or, in modeling jargon, physics). 
+
+The atmospheric equations of motion conserve total energy but the discretizations used in climate and weather models are usually not inherently total energy conservative. Exact conservation is probably not necessary but conservation to within $~$0.01  $W/m^2$ has been considered sufficient to avoid spurious trends in century long simulations \citep{B2000S,WOHTTV2015JAMES}. Spurious sources and sinks of total energy can be introduced by the dynamical core, physics, physics-dynamics coupling as well as discrepancies between the total energy of the continuous and discrete equations of motion and for the physics. Hence the study of total energy conservation in comprehensive models of the atmosphere quickly becomes a quite complex and detailed matter. In addition there can easily be compensating errors in the system as a whole.
+
+Here we focus on versions of the Community Atmosphere Model (CAM) that use the spectral-element \citep[SE, ][]{LetAl2018JAMES} and finite-volume \citep[FV, ][]{L2004MWR} dynamical cores. These dynamical cores couple with physics in a time-split manner, i.e. physics receives a state updated by dynamics \citep[see ][ for a discussion of time-split versus process split physics-dynamics coupling in the context of CAM]{W2002MWR}.
+
+In its pure time-split form the physics tendencies are added to the state previously produced by the dynamical core and the resulting state provides the initial state for the subsequent dynamical core calculation. We refer to this as state-updating. Alternatively, when the dynamical core adopts a shorter time step than the physics, say N sub-steps, then (1/N)th of the physics-calculated tendency is added to the state before each dynamics sub-step. We refer to this modification of time-splitting as {\em{dribbling}}. CAM-FV uses the state-update approach while CAM-SE has options to use state-update, {\em{dribbling}} or a combination of the two (i.e. some variables use state-updating and others use {\em{dribbling}}). The dribbling variants can lead to spurious sources or sinks of total energy referred to as physics-dynamics coupling errors.
+
+The dynamical core usually has implicit or explicit filters to control spurious noise near the grid scale which will lead to energy dissipation \citep{T2008JCP,JW2010LNCSE}. Similarly models often have sponge layers to control the solution near the top of the model that may be a sink of total energy. There are examples of numerical discretizations of the adiabatic frictionless equations motion that are designed so that total energy is conserved in the absence of time-truncation and filtering errors, e.g., mimetic spectral-element discretizations such as the one used in the horizontal in CAM-SE \citep{T2011LNCSEb}. These provide consistency between the discrete momentum and thermodynamic equations leading to global conservation associated with the conversion of potential to kinetic energy. In spectral transform models it is customary to add the energy change due to explicit diffusion on momentum back as heating (referred to as frictional heating), so that the diffusion of momentum does not affect the total energy budget \citep[see, e.g., p.71 in ][]{CAM5}. This is also done in CAM-SE \citep{LetAl2018JAMES}. 
+
+It is the purpose of this paper to provide a detailed total energy analysis of the CAM-SE and CAM-FV. ...
+
+
+%For example, the discrete total energy consistent with the dynamical core may differ from the one used in physics or,  even worse, the total energy that the continuous equations of motion conserve is different between the dynamical core and physics.\\
+
 \section{Method}
-\begin{itemize}
-\item `These fixers add a uniform increment to the temperature field to compensate for the global average energy lost by the dynamical core that time step. While this ensures a global energy balance, any impact of the conservation error would be in the spatial distribution which cannot be determined.' - \citet{WOHTTV2015JAMES}
-\end{itemize}
+\subsection{Defining total energy}
+In the following it is assumed that the model top and bottom are coordinate surfaces and that there is no flux of mass through the model top and bottom. In a dry atmosphere the total energy equation integrated over the entire sphere is given by
+\begin{equation}
+\frac{d}{dt}\int_{z=z_s}^{z=z_{top}}\iint_{\Omega} E_v \rho^{(d)}\, dA\, dz=\int_{z=z_s}^{z=z_{top}}\iint_{\Omega} F_{net}\, \rho^{(d)} dA\, dz,
+\end{equation}
+\citep[e.g., ][]{K1974MWR} where $F_{net}$ is net fluxes calculated by the parameterizations (e.g., heating and momentum forcing), $d/dt$ the total/material derivative, $z_s$ is the height of the surface, $\Omega$ the sphere, $\rho^{(d)}$ the density of dry air and $E_v$ is the total energy. $E_v$ can be split into kinetic energy $K=\frac{1}{2}\vec{v}^2$ ($\mathbf{v}$ is the wind vector), internal energy $c_v^{(d)}T$, where $c_v^{(d)}$ is the heat capacity of dry air at constant volume, and potential energy $\Phi=gz$
+\begin{equation}
+E_v=K+c_v^{(d)}T+\Phi.
+\end{equation}
+If the vertical integral is performed in a mass-based vertical coordinate, e.g., pressure, then the integrated total energy equation for a dry atmosphere can be written as
+\begin{equation}
+\frac{d}{dt}\int_{p=p_s}^{p=p_{top}}\iint_{\Omega} E_p \rho^{(d)}\, dA\, dp + \frac{d}{dt}\iint_{\Omega}\Phi_sp_s dA =\int_{p=p_s}^{p=p_{top}}\iint_{\Omega} F_{net}\, \rho dA\, dp,
+\end{equation}
+\citep[e.g., ][]{K1974MWR} where
+\begin{equation}
+E_p=K+c_p^{(d)}T.
+\end{equation}
+In a moist atmosphere, however, there are several definitions of total energy used in the literature related to what heat capacity is used for water vapor and whether or not condensates are accounted for in the energy equation. To explain the details of that we focus on the energy equation for CAM-SE.
 
 CAM-SE is formulated using a terrain-following hybrid-sigma vertical coordinate $\eta$ but the coordinate levels are defined in terms of dry air mass ($M^{(d)}$) instead of total air mass; $\eta^{(d)}$ \citep[see ][ for details]{LetAl2018JAMES}. In such a coordinate system it is convenient to define the tracer state in terms of a dry mixing ratio instead of moist mixing ratio
 \begin{equation}
 m^{(\ell)}\equiv \frac{\rho^{(\ell)}}{\rho^{(d)}}, \text{ where }\ell=`wv`,`cl`,`ci`,`rn`,`sw`,\label{eq:mx}
 \end{equation}
-where $\rho^{(d)}$ is the mass of dry air per unit volume of moist air and $\rho^{(\ell)}$ is the mass of the water substance of type $\ell$ per unit volume of moist air. Moist air refers to air containing dry air, water vapor, cloud liquid, cloud ice, rain amount and snow amount. For notational purposes define the set of all components of air
+where $\rho^{(d)}$ is the mass of dry air per unit volume of moist air and $\rho^{(\ell)}$ is the mass of the water substance of type $\ell$ per unit volume of moist air. Moist air refers to air containing dry air (`d`), water vapor (`wv`), cloud liquid (`cl`), cloud ice (`ci`), rain amount(`rn`) and snow amount(`sw`). For notational purposes define the set of all components of air
 \begin{equation}
 \mathcal{L}_{all}=\left\{ `d`,`wv`,`cl`,`ci`,`rn`,`sw`\right\},
 \end{equation}
 Define associated heat capacities at constant pressure $c_p^{(\ell)}$. Using the $\eta^{(d)}$ vertical coordinate and dry mixing ratios the total energy that the frictionless adiabatic equations of motion in the CAM-SE dynamical core conserves is 
 \begin{equation}
-E^{(dycore)}=\int_{\eta=0}^{\eta=1} \iint_\mathcal{S} \left( \frac{\partial M^{(d)}}{\partial \eta^{(d)}} \right)\sum_{\ell \in \mathcal{L}_{all}} \left[m^{(\ell)} \left(K+c_p^{(\ell)}T+\Phi_s  \right)\right]  dA d \eta^{(d)},\label{eq:comprehensice_energy}
+\left< E^{(dycore)}\right>=\int_{\eta=0}^{\eta=1} \iint_\mathcal{S} \left( \frac{\partial M^{(d)}}{\partial \eta^{(d)}} \right)\sum_{\ell \in \mathcal{L}_{all}} \left[m^{(\ell)} \left(K+c_p^{(\ell)}T+\Phi_s  \right)\right]  dA d \eta^{(d)},\label{eq:comprehensice_energy}
 \end{equation}
-where $K=\frac{1}{2}\mathbf{v}\cdot \mathbf{v}$ is the kinetic energy ($\mathbf{v}$ is the wind vector) and $\Phi_s$ is the surface geopotential.
+where $\Phi_s$ is the surface geopotential.
 
-In the CAM physical parameterizations a different definition of total energy is used. For the computation of total energy condensates are assumed to be zero and the heat capacity of moisture is the same as for dry air
+In the CAM physical parameterizations a different definition of total energy is used. Due to the evolutionary nature of the model development, the parameterizations have not yet been converted to match the SE dynamical core. For the computation of total energy condensates are assumed to be zero and the heat capacity of moisture is the same as for dry air. This is equivalent to using a moist mass (dry air plus water vapor) but $c_p$ of dry air.
 \begin{equation}
-E^{(physics)}=\int_{\eta=0}^{\eta=1} \iint_\mathcal{S} \left( \frac{\partial M^{(d)}}{\partial \eta^{(d)}} \right)\left(1+m^{(wv)}\right)\left[ \left(K+c_p^{(d)}T+\Phi_s\right)\right]dA d \eta^{(d)}.
+\left< E^{(physics)}\right> =\int_{\eta=0}^{\eta=1} \iint_\mathcal{S} \left( \frac{\partial M^{(d)}}{\partial \eta^{(d)}} \right)\left(1+m^{(wv)}\right)\left[ \left(K+c_p^{(d)}T+\Phi_s\right)\right]dA d \eta^{(d)}.
 \end{equation}
-One can make the adiabatic, frictionless equations of motion in the dynamical core conserve $E^{(physics)}$ by only including water vapor in the pressure field and setting the heat capacity for moisture to $c_p^{(d)}$ \citep{T2011LNCSEb}. We will make use of this configuration in the analysis presented in this paper.
+We note that earlier versions of CAM using the spectral transform dynamical core used $c_p$ of moist air. 
+One can make the adiabatic, frictionless equations of motion in the dynamical core conserve $E^{(physics)}$ by not including condensates in the mass/pressure field as well as energy conversion term in the thermodynamic equation and setting the heat capacity for moisture to $c_p^{(d)}$ \citep{T2011LNCSEb}. We will also make use of this configuration in the analysis presented in this paper.
 
-Under the assumption that pressure remains constant during the computation of the subgrid-scale parameterization tendencies, the total energy budget associated with each parameterization is closed. In other words, the total energy change in the column is exactly balanced by the net sources/sinks given by the fluxes through the column. That said, if parameterizations update specific humidity then the surface pressure changes (e.g., moisture leaving the column). {\color{red}{discuss energy implications ....}} \citep[section 3.1.8 in ][]{CAM5}
 
-
+\subsection{Spurious energy sources and sinks}
+In a weather/climate model total energy conservation errors can appear in many places throughout the algorithm. Below is a general list of where conservation errors can appear with specific examples from CAM:
+\begin{itemize}
+\item {\em{Parameterization errors}}: Individual parameterizations may not have a closed energy budget. However, CAM parameterizations are required to have a closed energy budget under the assumption that pressure remains constant during the computation of the subgrid-scale parameterization tendencies. In other words, the total energy change in the column is exactly balanced by the net sources/sinks given by the fluxes through the column. 
+\item {\em{Pressure work}}: That said, if parameterizations update specific humidity then the surface pressure changes (e.g., moisture leaving the column). In that case the pressure changes which, in turn, changes total energy, here referred to as {\em{pressure work}} \citep[section 3.1.8 in ][]{CAM5}.
+\item {\em{Physics-dynamics coupling (PDC)}}: Assume that physics computes a tendency. Usually the tendency is passed to the dynamical core which is responsible for adding the tendencies to the state before advancing the dynamics. PDC energy errors can be split into two types:
+\begin{itemize}
+\item {\em{`Dribbling' errors (or, equivalently, temporal PDC errors)}}: If the total energy increment from the parameterizations does not match the change in total energy when the tendencies are added to the state in the dynamical core, then there will be a spurious PDC error. This will not happen with the state-update approach in which the tendencies are added immediate after physics and before the dynamical core advances the solution in time, but it does happen with dribbling. 
+\item {\em{Change of vertical grid/coordinate errors}}: If the vertical coordinate in physics and in the dynamical core are different then there can be spurious PDC energy errors even when using the state-update method for adding tendencies to the dynamical core state. For example, many non-hydrostatic dynamical cores \citep[e.g. MPAS, ]{MPASatm} use a terrain-following height coordinate whereas physics uses pressure.
+\item {\em{Change of horizontal grid errors:}} If the physics tendencies are computed on a different horizontal grid than the dynamical core then there can be spurious energy errors from mapping tendencies between horizontal grids \citep[e.g., ][]{HetAl2018MWR}. 
+\end{itemize}
+\item {\em{Dynamical core errors}}: Energy conservation errors in the dynamical core, not related to PDC errors, can arise in multiple parts of the algorithms used to solve the equations of motion. For dynamical cores employing implicit filtering \citep[e.g., limiters in flux operators ][]{L2004MWR} and/or possessing inherent damping to control small scales, it is hard to diagnose what their energy dissipation is compared to other errors in the discretization. If explicit filtering is used, e.g., hyperviscosity on momentum, then one can diagnose the energy dissipation from filtering and add a corresponding heating to balance it. There may also be energy loss from viscosity applied to other variables such a temperature or surface pressure which are harder to compensate. Here is a beak-down relevant to CAM-SE using a floating Lagrangian vertical coordinate:
+\begin{itemize}
+\item Horizontal inviscid dynamics: Energy errors resulting from solving the inviscid, adiabatic equations of motion.
+\item Hyperviscosity: Filtering errors.
+\item Vertical remapping: The vertical remapping algorithm does not conserve total energy.
+\end{itemize}
+\item {\em{Continuous total energy formula discrepancy}}:  If the continuous equations of motion for the dynamical core conserve a total energy different from the one used in the parameterizationsthen an energy inconsistency is present in the system as a whole. This is the case with the new version of CAM-SE that conserves a total energy that is more accurate and comprehensive than the CAM physics package as discussed above. As also noted above, this mismatch arose from the evolutionary nature of the model development and not by deliberate design.
+\end{itemize}
+To avoid total energy conservation errors which could accumulate and ultimately lead to a climate drift, it is customary to use an energy fixer to restore total energy conservation. Since the spatial distribution of energy errors, in general, is not known, global fixers are used. In CAM a uniform increment is added to the temperature field to compensate for total energy loss in the dynamical core, physics-dynamics coupling and energy change dues to pressure work. 
+%
 \section{Results}
 `The discrepancy between the more comprehensive energy formula \eqref{eq:comprehensice_energy} and the CAM physics formula for total energy is about 0.5 $W/m^2$ \citep{T2011LNCSEb}. By only including dry air and water vapor   in $\rho$ and setting $c_p^{(wv)}= c_p^{(d)}$ in the equations of motion, the dynamical core (in the absence of truncation errors) will conserve the energy used in CAM physics.'
 
@@ -250,7 +299,7 @@ Under the assumption that pressure remains constant during the computation of th
 \verb+  +{\color{blue}{output 'dED'}}\\
 \verb+  do ns=1,nsplit+\\
 \verb+    +{\color{blue}{output 'dAF'}}\\
-\verb+    Update state with physics tendencies+\\
+\verb+    Update state with (1/nsplit) of the physics tendencies+\\
 \verb+    +{\color{blue}{output 'dBD'}}\\
 \verb+    do nr=1,rsplit+\\
 \verb+       Advance the adiabatic frictionless equations of motion +\\
