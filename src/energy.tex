@@ -272,15 +272,24 @@ In a weather/climate model total energy conservation errors can appear in many p
 \item Vertical remapping: The vertical remapping algorithm does not conserve total energy.
 \item Near round-off negative values
 \end{itemize}
-\item {\em{Continuous total energy formula discrepancy}}:  If the continuous equations of motion for the dynamical core conserve a total energy different from the one used in the parameterizationsthen an energy inconsistency is present in the system as a whole. This is the case with the new version of CAM-SE that conserves a total energy that is more accurate and comprehensive than the CAM physics package as discussed above. As also noted above, this mismatch arose from the evolutionary nature of the model development and not by deliberate design.
+\item {\em{Continuous total energy formula discrepancy}}:  If the continuous equations of motion for the dynamical core conserve a total energy different from the one used in the parameterizations then an energy inconsistency is present in the system as a whole. This is the case with the new version of CAM-SE that conserves a total energy that is more accurate and comprehensive than the CAM physics package as discussed above. As also noted above, this mismatch arose from the evolutionary nature of the model development and not by deliberate design.
 \end{itemize}
 To avoid total energy conservation errors which could accumulate and ultimately lead to a climate drift, it is customary to use an energy fixer to restore total energy conservation. Since the spatial distribution of energy errors, in general, is not known, global fixers are used. In CAM a uniform increment is added to the temperature field to compensate for total energy loss in the dynamical core, physics-dynamics coupling and energy change dues to pressure work. 
 %
 \section{Results}
+\subsection{Temporal averaging}
+ \begin{figure}[h]
+ \centering
+ \includegraphics[width=35pc]{figs/dEdt.pdf}
+ \caption{{\color{red}{[in note form] Note that the parameterizations have a closed energy budget so the fluctuations in the energy change due to parameterizations is balanced by fluxes in/out of the physics columns. The purpose of this Figure is to show that the energy tendency in the dynamical core is quite constant (to within ~0.2 $W/m^2$ or less); so only one month simulation may be enough to assess energy diagnostics for the dynamical core. DME adjust fluctuates with the physics forcing; obviously the energy fixers fluctuates with DME adjust. The {\em{consistency check}} (triangles) shows that the energy fixer exactly compensates for total energy loss in dynamical core and dme adjust (there are no physics dynamics coupling errors in this configuration).}}}
+ \label{figone}
+  \end{figure}
+
+
 `The discrepancy between the more comprehensive energy formula \eqref{eq:comprehensice_energy} and the CAM physics formula for total energy is about 0.5 $W/m^2$ \citep{T2011LNCSEb}. By only including dry air and water vapor   in $\rho$ and setting $c_p^{(wv)}= c_p^{(d)}$ in the equations of motion, the dynamical core (in the absence of truncation errors) will conserve the energy used in CAM physics.'
 
 \subsection{Configuration 1: Consistent total energy definitions in parameterizations and dynamical core, and total energy conserving physics-dynamics coupling}
-This configuration is most energetically consistent in that the physical parameterizations and the continuous equations of motion on which the dynamical is based, conserve the same total energy $\left< E^{(physics)}\right>$ defined in equation \eqref{eq:Ephys}; and there are no spurious sources/sinks in physics-dynamics coupling. Energetic consistency in dynamics and physics is obtainged by setting $c_p^{(\ell)}\equiv c_p^{d}\equiv$ and $\mathcal{L}_{all}=\left\{ `d`,`wv`\right\}$. If the parameterizations effectively update the model state then there are no physics-dynamics coupling errors \citep[$\tt{ftype=1}$ setup described in detail in ][]{LetAl2018JAMES}. Namelist changes resulting in this configuration are $\tt{lcp\_moist}=.true.$, $\tt{se\_qsize\_condensate\_loading=1}$, and $\tt{ftype=1}$.
+This configuration is most energetically consistent in that the physical parameterizations and the continuous equations of motion on which the dynamical is based, conserve the same total energy $\left< E^{(physics)}\right>$ defined in equation \eqref{eq:Ephys}; and there are no spurious sources/sinks in physics-dynamics coupling. Energetic consistency in dynamics and physics is obtained by setting $c_p^{(\ell)}\equiv c_p^{d}\equiv$ and $\mathcal{L}_{all}=\left\{ `d`,`wv`\right\}$. If the parameterizations effectively update the model state then there are no physics-dynamics coupling errors \citep[$\tt{ftype=1}$ setup described in detail in ][]{LetAl2018JAMES}. Namelist changes resulting in this configuration are $\tt{lcp\_moist}=.true.$, $\tt{se\_qsize\_condensate\_loading=1}$, and $\tt{ftype=1}$.
 \begin{figure}[h]
 % \centering
 % when using pdflatex, use pdf file:
