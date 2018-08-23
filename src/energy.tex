@@ -247,6 +247,7 @@ where $\Phi_s$ is the surface geopotential.
 
 In the CAM physical parameterizations a different definition of total energy is used. Due to the evolutionary nature of the model development, the parameterizations have not yet been converted to match the SE dynamical core. For the computation of total energy condensates are assumed to be zero and the heat capacity of moisture is the same as for dry air. This is equivalent to using a moist mass (dry air plus water vapor) but $c_p$ of dry air.
 \begin{equation}
+\label{eq:Ephys}
 \left< E^{(physics)}\right> =\int_{\eta=0}^{\eta=1} \iint_\mathcal{S} \left( \frac{\partial M^{(d)}}{\partial \eta^{(d)}} \right)\left(1+m^{(wv)}\right)\left[ \left(K+c_p^{(d)}T+\Phi_s\right)\right]dA d \eta^{(d)}.
 \end{equation}
 We note that earlier versions of CAM using the spectral transform dynamical core used $c_p$ of moist air. 
@@ -269,6 +270,7 @@ In a weather/climate model total energy conservation errors can appear in many p
 \item Horizontal inviscid dynamics: Energy errors resulting from solving the inviscid, adiabatic equations of motion.
 \item Hyperviscosity: Filtering errors.
 \item Vertical remapping: The vertical remapping algorithm does not conserve total energy.
+\item Near round-off negative values
 \end{itemize}
 \item {\em{Continuous total energy formula discrepancy}}:  If the continuous equations of motion for the dynamical core conserve a total energy different from the one used in the parameterizationsthen an energy inconsistency is present in the system as a whole. This is the case with the new version of CAM-SE that conserves a total energy that is more accurate and comprehensive than the CAM physics package as discussed above. As also noted above, this mismatch arose from the evolutionary nature of the model development and not by deliberate design.
 \end{itemize}
@@ -277,7 +279,8 @@ To avoid total energy conservation errors which could accumulate and ultimately 
 \section{Results}
 `The discrepancy between the more comprehensive energy formula \eqref{eq:comprehensice_energy} and the CAM physics formula for total energy is about 0.5 $W/m^2$ \citep{T2011LNCSEb}. By only including dry air and water vapor   in $\rho$ and setting $c_p^{(wv)}= c_p^{(d)}$ in the equations of motion, the dynamical core (in the absence of truncation errors) will conserve the energy used in CAM physics.'
 
-
+\subsection{Configuration 1: Consistent total energy definitions in parameterizations and dynamical core, and total energy conserving physics-dynamics coupling}
+This configuration is most energetically consistent in that the physical parameterizations and the continuous equations of motion on which the dynamical is based, conserve the same total energy $\left< E^{(physics)}\right>$ defined in equation \eqref{eq:Ephys}; and there are no spurious sources/sinks in physics-dynamics coupling. Energetic consistency in dynamics and physics is obtainged by setting $c_p^{(\ell)}\equiv c_p^{d}\equiv$ and $\mathcal{L}_{all}=\left\{ `d`,`wv`\right\}$. If the parameterizations effectively update the model state then there are no physics-dynamics coupling errors \citep[$\tt{ftype=1}$ setup described in detail in ][]{LetAl2018JAMES}. Namelist changes resulting in this configuration are $\tt{lcp\_moist}=.true.$, $\tt{se\_qsize\_condensate\_loading=1}$, and $\tt{ftype=1}$.
 \begin{figure}[h]
 % \centering
 % when using pdflatex, use pdf file:
