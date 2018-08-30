@@ -84,7 +84,7 @@
 
 % Example: \title{This is a test title}
 
-\title{Physics-dynamics coupling and a detailed total energy analysis of the Community Atmosphere Model (CAM)}
+\title{A detailed total energy and physics-dynamics coupling analysis of the Community Atmosphere Model (CAM)}
 
 %% ------------------------------------------------------------------------ %%
 %
@@ -394,17 +394,48 @@ This is useful if the diagnostics are not implemented in the dynamical core; in 
 
 
 
-\subsection{Configuration 1: Consistent TE definitions in parameterizations and dynamical core, and TE conserving physics-dynamics coupling}
+\subsection{TE consistent physics-dynamics coupling ($ftype=1$) and TE formula}
 This configuration is most energetically consistent in that the physical parameterizations and the continuous equations of motion on which the dynamical is based, conserve the same TE $\left< E^{(physics)}\right>$ defined in equation \eqref{eq:Ephys}; and there are no spurious sources/sinks in physics-dynamics coupling. Energetic consistency in dynamics and physics is obtained by setting $c_p^{(\ell)}\equiv c_p^{d}\equiv$ and $\mathcal{L}_{all}=\left\{ `d`,`wv`\right\}$. If the parameterizations effectively update the model state then there are no physics-dynamics coupling errors \citep[$\tt{ftype=1}$ setup described in detail in ][]{LetAl2018JAMES}. Namelist changes resulting in this configuration are $\tt{lcp\_moist}=.true.$, $\tt{se\_qsize\_condensate\_loading=1}$, and $\tt{ftype=1}$.
 
 Configuration 1 in AMIP-type simulation ({\em{F2000climo}}) is used to compute baseline TE tendencies which will be used to compute/compare with other model configurations/setups. First it is established how long an average is needed to get robust TE tendency estimates. Figure \ref{fig:dEdt(t)} shows $\partial \gi{E}$ for various aspects of CAM-SE as a function of time. First lets focus on the left plot. The TE tendency from parameterizations ($\partial \gi{E}^{(param)}_{phys}$) show significant variability with an amplitude of approximately 2.5$W/(m^2s)$. As noted above this term does not figure in the spurious TE budget. That said, the variability is reflected on to the TE tendency due to pressure work $\partial \gi{E}^{(pwork)}_{phys}\approx 0.3\pm 0.08 W/(m^2s)$. On the scale used in the left-hand plot the TE tendency of the adiabatic dynamical core $\partial \gi{E}^{(adiab)}_{dyn}$ does not seem to be affected by $\partial \gi{E}^{(param)}_{phys}$ or $\partial \gi{E}^{(pwork)}_{phys}$ in terms of variability, and remains stable at approximately 0.6$W/(m^2s)\pm ~0.02 W/(m^2s)$. The TE fixer, in this model configuration, fixes $\partial \gi{E}^{(adiab)}_{dyn}$ and $\partial \gi{E}^{(pwork)}_{phys}$. Since the TE in the adiabatic dynamics remains approximately constant and the TE tendency associated with pressure work has variability, the TE tendency from the $\partial \gi{E}^{(efix)}_{phys}$ has variability; $\partial \gi{E}^{(efix)}_{phys}\approx 0.3 \pm 0.08 W/(m^2s)$. As a consistency check $-\partial \gi{E}^{(adiab)}_{dyn}-\partial \gi{E}^{(pwork)}_{phys}$ is plotted with asterisk's and they coincide (as expected) with $\partial \gi{E}^{(efix)}_{phys}$.
 
 The right-hand plot in  Figure \ref{fig:dEdt(t)} shows a breakdown of the dynamical core TE tendencies. The majority of the TE dissipation is due to hyperviscosity on temperature and pressure, $\partial \gi{E}^{(hvis)}_{dyn}\approx -0.6\pm 0.01 W/(m^2s)$. The diffusion of momentum is added back as frictional heating and is therefore not part of $\partial \gi{E}^{(hvis)}_{dyn}$. The frictional heating is a significant term in the TE tendency budget $\partial \gi{E}^{(fheat)}_{dyn}\approx 0.58\pm 0.02 W/(m^2s)$ and exhibits some variability but with a rather small amplitude. The remaining TE dissipation in the floating Lagrangian dynamics is inviscid dissipation and time-truncation errors $\partial \gi{E}_{dyn}^{(res)}=\partial \gi{E}_{dyn}^{({2D})}-\partial \gi{E}_{dyn}^{({hvis})}\approx 0.007 W/(m^2s)$. The TE tendency from vertical remapping is approximately $\partial \gi{E}_{dyn}^{({remap})}\approx -0.01 W/(m^2s)$. To within $~0.02 W/(m^2s)$ the dynamical core TE tendency terms can be computed from just one months average. The TE tendencies computed in physics exhibit more variability and are only accurate to $~0.1 W/(m^2s)$ after a one month average (excluding $\partial \gi{E}^{(param)}_{phys}$). 
 
+While it is advantageous to use $ftype=1$ (state-update) physics-dynamics coupling algorithm in terms if having no spurious TE tendency from coupling ($\partial \gi{E}^{({pdc})}=0$), it does results in spurious gravity waves in the simulations. For example, Figure \ref{fig:abs_dpsdt}a shows a 1 year average of $|\frac{dp_s}{dt}|$ and it clearly exhibits unphysical oscillations coinciding with element boundaries. Details of the spectral-element method, its coupling to physics and noise issues are discussed in detail in \citet{HetAl2018MWR}. The gravity wave noise in the solutions are even visible in the 500hPa pressure velocity annual average (Figure \ref{fig:omega500}a). This issue can be alleviated by using a shorter physics time-step so that the physics increments are smaller (not shown). 
 
+\subsubsection{Non-TE conservative 'dribbling' physics-dynamics coupling ($ftype=0$)}\label{se:pdc_problem}
+When switching to $ftype=0$ physics-dynamics coupling algorithm in which the tendencies from physics are added throughout the dynamics (in this case twice per physics time-step) then the noise issue disappears (Figure \ref{fig:abs_dpsdt}b and \ref{fig:omega500}b). That said, there are issues with this approach. One being that the tracer mass budgets may be violated. This is illustrated in Figure \ref{fig:ftype_schematic} as explained in the next paragraph. 
+
+The orange curve on Figure \ref{fig:ftype_schematic}a, b, d, and e is the initial state of, e.g., cloud liquid mixing ratio as a function of location, e.g., longitude. The light blue errors show the increments (in terms of length of arrow) computed by the parameterizations based on the initial state. With $ftype=1$ the increments from physics are added to the dynamical core state (dotted line on \ref{fig:ftype_schematic}b)) before the dynamical core advances the solution in time. The parameterizations designed to not drive the mixing ratios negative. Then the dynamical core advect the distribution (solid curve on Figure \ref{fig:ftype_schematic}c). With $ftype=0$ the physics increments are split into equal chunks (in this illustration two; blue errors on Figure \ref{fig:ftype_schematic}d). First half of the physics increments are added to the initial state (dotted line on Figure \ref{fig:ftype_schematic}e)) and then dynamics advects distribution half of the total dynamical core steps (dashed line on Figure \ref{fig:ftype_schematic}e). Then the other half of the physics increments are applied (in the same location as they were computed by physics). Now after the advection step the distribution has moved and the mixing ratio may be zero (or less than the increment) where the physics forcing is applied (e.g., left side of dashed curve). Hence the physics increment is driving the mixing ratios negative in those locations and the distribution is advected (solid curve on Figure \ref{fig:ftype_schematic}f). In CAM the increments added in the dynamical core are limited so that they drive the mixing to zero (and not negative) if this problem occurs. This leads to a net source of mass compared to what the parameterizations prescribe. This issue has been discussed in \cite{water-leak}. {\color{red}{show figs of conservation issue}}. 
+
+The majority of the noise with $ftype=1$ physics-dynamics coupling method comes from momentum sources/sinks and heating/cooling. A way alleviate noise problems and, at the same time, close the tracer mass budgets (in physics-dynamics coupling) is to use $ftype=1$ coupling for tracers and $ftype=0$ coupling for momentum and temperature. Figure \ref{fig:abs_dpsdt}c shows 
+
+
+ \begin{figure}[h]
+ \centering
+ \includegraphics[width=35pc]{figs/ftype_schematic.pdf}
+ \caption{A schematic of state-update ($ftype=1$; row 1) and `dribbling' ($ftype=0$; row 2) physics-dynamics coupling algorithms. See Section \ref{se:pdc_problem} for details.}
+ \label{fig:ftype_schematic}
+  \end{figure}
 
 \subsection{Configuration 3: CMIP6 version}
 `The discrepancy between the more comprehensive energy formula \eqref{eq:comprehensice_energy} and the CAM physics formula for TE is about 0.5 $W/m^2$ \citep{T2011LNCSEb}. By only including dry air and water vapor   in $\rho$ and setting $c_p^{(wv)}= c_p^{(d)}$ in the equations of motion, the dynamical core (in the absence of truncation errors) will conserve the energy used in CAM physics.'
+
+
+ \begin{figure}[h]
+ \centering
+ \includegraphics[width=35pc]{figs/abs_dpsdt.pdf}
+ \caption{}
+ \label{fig:abs_dpsdt}
+  \end{figure}
+
+
+ \begin{figure}[h]
+ \centering
+ \includegraphics[width=35pc]{figs/omega500.pdf}
+ \caption{Same as Figure \ref{fig:abs_dpsdt} but for 500hPa vertical pressure velocity.}
+ \label{fig:omega500}
+  \end{figure}
 
 \begin{figure}[h]
 % \centering
