@@ -263,18 +263,18 @@ In a weather/climate model TE conservation errors can appear in many places thro
 \item {\em{Parameterization errors}}: Individual parameterizations may not have a closed energy budget. CAM parameterizations are required to have a closed energy budget under the assumption that pressure remains constant during the computation of the subgrid-scale parameterization tendencies. In other words, the TE change in the column is exactly balanced by the net sources/sinks given by the fluxes through the column. 
 \item {\em{Pressure work}}: That said, if parameterizations update specific humidity then the surface pressure changes (e.g., moisture leaving the column). In that case the pressure changes which, in turn, changes TE. This is referred to as {\em{pressure work}} \citep[section 3.1.8 in ][]{CAM5}.
 \item {\em{Continuous TE formula discrepancy}}:  If the continuous equations of motion for the dynamical core conserve a TE different from the one used in the parameterizations then an energy inconsistency is present in the system as a whole. This is the case with the new version of CAM-SE that conserves a TE that is more accurate and comprehensive than the CAM physics package as discussed above. As also noted above, this mismatch arose from the evolutionary nature of the model development and not by deliberate design.
-\item {\em{Physics-dynamics coupling (PDC)}}: Assume that physics computes a tendency. Usually the tendency is passed to the dynamical core which is responsible for adding the tendencies to the state. PDC energy errors can be split into two types:
-\begin{itemize}
-\item {\em{`Dribbling' errors (or, equivalently, temporal PDC errors)}}: If the TE increment from the parameterizations does not match the change in TE when the tendencies are added to the state in the dynamical core, then there will be a spurious PDC error. This will not happen with the state-update approach in which the tendencies are added immediate after physics and before the dynamical core advances the solution in time, but it does happen with dribbling. 
-\item {\em{Change of vertical grid/coordinate errors}}: If the vertical coordinate in physics and in the dynamical core are different then there can be spurious PDC energy errors even when using the state-update method for adding tendencies to the dynamical core state. For example, many non-hydrostatic dynamical cores \citep[e.g. MPAS, ]{MPASatm} use a terrain-following height coordinate whereas physics uses pressure.
-\item {\em{Change of horizontal grid errors:}} If the physics tendencies are computed on a different horizontal grid than the dynamical core then there can be spurious energy errors from mapping tendencies between horizontal grids \citep[e.g., ][]{HetAl2018MWR}. 
-\end{itemize}
 \item {\em{Dynamical core errors}}: Energy conservation errors in the dynamical core, not related to PDC errors, can arise in multiple parts of the algorithms used to solve the equations of motion. For dynamical cores employing implicit filtering \citep[e.g., limiters in flux operators ][]{L2004MWR} and/or possessing inherent damping to control small scales, it is hard to diagnose what their energy dissipation is compared to other errors in the discretization. If explicit filtering is used, e.g., hyperviscosity on momentum, then one can diagnose the energy dissipation from filtering and add a corresponding heating to balance it. There may also be energy loss from viscosity applied to other variables such a temperature or surface pressure which are harder to compensate. Here is a beak-down relevant to CAM-SE using a floating Lagrangian vertical coordinate:
 \begin{itemize}
 \item Horizontal inviscid dynamics: Energy errors resulting from solving the inviscid, adiabatic equations of motion.
 \item Hyperviscosity: Filtering errors.
 \item Vertical remapping: The vertical remapping algorithm does not conserve TE.
 \item Near round-off negative values
+\end{itemize}
+\item {\em{Physics-dynamics coupling (PDC)}}: Assume that physics computes a tendency. Usually the tendency is passed to the dynamical core which is responsible for adding the tendencies to the state. PDC energy errors can be split into two types:
+\begin{itemize}
+\item {\em{`Dribbling' errors (or, equivalently, temporal PDC errors)}}: If the TE increment from the parameterizations does not match the change in TE when the tendencies are added to the state in the dynamical core, then there will be a spurious PDC error. This will not happen with the state-update approach in which the tendencies are added immediate after physics and before the dynamical core advances the solution in time, but it does happen with dribbling. 
+\item {\em{Change of vertical grid/coordinate errors}}: If the vertical coordinate in physics and in the dynamical core are different then there can be spurious PDC energy errors even when using the state-update method for adding tendencies to the dynamical core state. For example, many non-hydrostatic dynamical cores \citep[e.g. MPAS, ]{MPASatm} use a terrain-following height coordinate whereas physics uses pressure.
+\item {\em{Change of horizontal grid errors:}} If the physics tendencies are computed on a different horizontal grid than the dynamical core then there can be spurious energy errors from mapping tendencies between horizontal grids \citep[e.g., ][]{HetAl2018MWR}. 
 \end{itemize}
 \end{enumerate}
 To avoid TE conservation errors which could accumulate and ultimately lead to a climate drift, it is customary to use an energy fixer to restore TE conservation. Since the spatial distribution of energy errors, in general, is not known, global fixers are used. In CAM a uniform increment is added to the temperature field to compensate for TE loss in the dynamical core, physics-dynamics coupling, TE formula discrepancy and energy change due to pressure work. 
@@ -307,7 +307,8 @@ By computing the global TE integrals $\gi{E}$ at appropriate places in the model
 \verb+  +{\color{blue}{output 'dED'}}\\
 \verb+  do ns=1,nsplit+\\
 \verb+    +{\color{blue}{output 'dAF'}}\\
-\verb+    Update state with (1/nsplit) of the physics tendencies+\\
+\verb+    Update state with (1/nsplit) of the physics tendencies (ftype=2)+\\
+\verb+    if (ns==1) Update state with entire physics tendency (ftype=1)+\\
 \verb+    +{\color{blue}{output 'dBD'}}\\
 \verb+    do nr=1,rsplit+\\
 \verb+       Advance the adiabatic frictionless equations of motion +\\
@@ -344,6 +345,7 @@ where $\Delta t_{phys}$ is the physics time-step (1800s) and the subscript $phys
 \begin{equation}
 \partial \gi{E}_{phys}^{({pwork})}=\frac{\gi{E}_{pAM}-\gi{E}_{pAP}}{\Delta t_{phys}}.
 \end{equation}
+{\color{red}{In CAM-SE this tendency is implicit!!!}}
 The total forcing from physics (at least in CAM) consists of parameterizations, pressure work and TE fixer, with associated energy tendency
 \begin{equation}
 \partial \gi{E}_{phys}^{({efix})}=\frac{\gi{E}_{pBP}-\gi{E}_{pBF}}{\Delta t_{phys}}.
@@ -352,26 +354,10 @@ For notational convenience we refer to the associated energy tendency from all o
 \begin{equation}
 \partial \gi{E}_{phys}^{({phys})}\equiv \partial \gi{E}_{phys}^{({param})}+\partial \gi{E}_{phys}^{({pwork})}+\partial \gi{E}_{phys}^{({efix})}=\frac{\gi{E}_{pAM}-\gi{E}_{pBF}}{\Delta t_{phys}}.
 \end{equation}
+{\color{red}{DO WE NEED THIS????}}
 \item $\partial \gi{E}^{({discr})}$: If the physics uses a TE definition different from the TE that the continuous equations of motion in the dynamical core conserve (in the absence of dicretization errors), then there is a TE discrepancy tendency. This complicates the energy analysis as one can not compare TE computed in physics $\gi{E}_{phys}$ directly with TE computed in the dynamical core $\gi{E}_{dyn}$. This makes errors associated with this discrepancy tricky to assess. That said, the TE tendencies computed using the dynamical core TE formula $\partial \gi{E}_{dyn}$ are well defined (self consistent) and similarly for TE tendencies computed using the `physics formula' for TE: $\partial \gi{E}_{phys}$.
 
 
-\item $\partial \gi{E}^{({pdc})}$: Total spurious energy tendency due to physics-dynamics coupling errors is the difference between the energy tendency from physics and the energy tendency in the dynamics resulting from adding the physics increment to the dynamical core state
-\begin{equation}
-\label{eq:pdc}
-\partial \gi{E}^{({pdc})}=\partial \gi{E}_{phys}^{({phys})}-\partial \gi{E}_{dyn}^{({phys})} \text{ assuming }\partial \gi{E}^{({discr})}=0,
-\end{equation}
-where
-\begin{equation}
-\partial \gi{E}_{dyn}^{({param})}=\frac{\gi{E}_{dAD}-\gi{E}_{dAF}}{\Delta t_{pdc}},
-\end{equation}
-and $\Delta t_{pdc}$ is the time-step between physics increments being added to the dynamical core. The physics-dynamics coupling TE tendency makes use of TE formulas in dynamics and in physics so \eqref{eq:pdc} is only well-defined if the TE formula discrepancy is zero, $\partial \gi{E}^{({discr})}=0$. As mentioned in Section \ref{sec:defE}, CAM-SE has the option to switch the continuous equations of motion conserving the TE used by CAM physics \eqref{eq:Ephys} instead of the more comprehensive TE \eqref{eq:comprehensice_energy}.
-
-In CAM-SE there are 3 physics-dynamics coupling algorithms described in detail in section 3.6 in \citet{LetAl2018JAMES}. One is state-update in which the entire physics increments is added to the dynamics state at the beginning of dynamics (referred to as $ftype=1$), in which case $\Delta t_{pdc}=\Delta t_{phys}$, one is `dribbling' in which the physics tendency is split into $nsplit$ equal chunks and added throughout dynamics (more precisely after every vertical remapping; referred to as $ftype=0$ resulting in $\Delta t_{pdc}=\frac{1}{nsplit}\Delta t_{phys}$), and then a combination of the two where tracers use  $ftype=1$ and all other physics tendencies used  $ftype=0$ (referred to as $ftype=2$). The various parameters for defining time-steps in terms of `split parameters' (such as $nsplit$) are defined in Figure \ref{fig:dAD}.
-%where the subscript $phys$ in $\partial \gi{E}_{phys}^{({phys})}$ refers to the TE tenendency being computed in CAM physics using the formula for energy consistent with physics \eqref{eq:Ephys}. In CAM the vertical and horizontal grids in physics and dynamics coincide  so physics-dynamics coupling errors are due to the temporal aspect of coupling (errors due to `dribbling' tendencies in the dynamical core). The TE tenendency due to physics tendencies being added to the dynamical core is
-%\begin{equation}
-%\partial \gi{E}^{({phys})}_{dyn}=
-%\end{equation}
-%If the same energy definition is used in the physics and dynamical core, and an energy conservative physics dynamics coupling method is used, then $\partial \gi{E}_{phys}^{({param})}$.
 \item The TE tendency from the dynamical core is split into several terms:
 \begin{itemize} 
 \item Horizontal adiabatic dynamics (dynamics excluding physics forcing tendency)
@@ -404,6 +390,26 @@ The 3D adiabatic dynamical core (no physics forcing) energy tendency is denoted
 \begin{equation}
 \partial \gi{E}_{dyn}^{({adiab})}=\partial \gi{E}_{dyn}^{({2D})}+\partial \gi{E}_{dyn}^{({remap})}.
 \end{equation}
+\item $\partial \gi{E}^{(pdc)}$: Total spurious energy tendency due to physics-dynamics coupling errors is the difference between the energy tendency from physics and the energy tendency in the dynamics resulting from adding the physics increment to the dynamical core state
+\begin{equation}
+\label{eq:pdc}
+\partial \gi{E}^{(pdc)}=\partial \gi{E}_{phys}^{({phys})}-\partial \gi{E}_{dyn}^{({phys})} \text{ assuming }\partial \gi{E}^{({discr})}=0,
+\end{equation}
+where
+\begin{equation}
+\partial \gi{E}_{dyn}^{({phys})}=\frac{\gi{E}_{dAD}-\gi{E}_{dAF}}{\Delta t_{pdc}},
+\end{equation}
+and $\Delta t_{pdc}$ is the time-step between physics increments being added to the dynamical core. 
+
+The physics-dynamics coupling TE tendency makes use of TE formulas in dynamics and in physics so \eqref{eq:pdc} is only well-defined if the TE formula discrepancy is zero, $\partial \gi{E}^{({discr})}=0$. As mentioned in Section \ref{sec:defE}, CAM-SE has the option to switch the continuous equations of motion conserving the TE used by CAM physics \eqref{eq:Ephys} instead of the more comprehensive TE \eqref{eq:comprehensice_energy}.
+
+In CAM-SE there are 3 physics-dynamics coupling algorithms described in detail in section 3.6 in \citet{LetAl2018JAMES}. One is state-update in which the entire physics increments is added to the dynamics state at the beginning of dynamics (referred to as $ftype=1$), in which case $\Delta t_{pdc}=\Delta t_{phys}$, one is `dribbling' in which the physics tendency is split into $nsplit$ equal chunks and added throughout dynamics (more precisely after every vertical remapping; referred to as $ftype=0$ resulting in $\Delta t_{pdc}=\frac{1}{nsplit}\Delta t_{phys}$), and then a combination of the two where tracers use  $ftype=1$ and all other physics tendencies used  $ftype=0$ (referred to as $ftype=2$). The various parameters for defining time-steps in terms of `split parameters' (such as $nsplit$) are defined in Figure \ref{fig:dAD}.
+%where the subscript $phys$ in $\partial \gi{E}_{phys}^{({phys})}$ refers to the TE tenendency being computed in CAM physics using the formula for energy consistent with physics \eqref{eq:Ephys}. In CAM the vertical and horizontal grids in physics and dynamics coincide  so physics-dynamics coupling errors are due to the temporal aspect of coupling (errors due to `dribbling' tendencies in the dynamical core). The TE tenendency due to physics tendencies being added to the dynamical core is
+%\begin{equation}
+%\partial \gi{E}^{({phys})}_{dyn}=
+%\end{equation}
+%If the same energy definition is used in the physics and dynamical core, and an energy conservative physics dynamics coupling method is used, then $\partial \gi{E}_{phys}^{({param})}$.
+
 \end{itemize}
 \end{enumerate}
 \subsection{A couple of observations regarding the energy budget terms}
@@ -414,11 +420,19 @@ It is useful to note that the energy fixer `fixes' energy dissipation in the dyn
 \end{equation}
 The forcing from the parameterizations, $\partial \gi{E}_{phys}^{({param})}$, does not appear in this budget (although the dynamical core state does `feel' the parameterization forcing) as the energy cycle for the parameterizations is, by design in CAM, closed (balanced by fluxes in/out of the physics columns). If $\partial \gi{E}^{({discr})}=0$, one can use \eqref{eq:budget_efix} to diagnose energy dissipation in the dynamical core and physics-dynamics coupling from quantities computed in physics
 \begin{equation}
+\label{eq:pdc2}
 \partial \gi{E}_{dyn}^{({adiab})}+\partial \gi{E}^{({pdc})}=-\partial \gi{E}_{phys}^{({efix})}-\partial \gi{E}_{phys}^{({pwork})} \text{ for  }\partial \gi{E}^{({discr})}=0.
 \end{equation}
-This is useful if the diagnostics are not implemented in the dynamical core; in particular, if $ftype=1$ physics-dynamics coupling method is used then $\partial \gi{E}^{({pdc})}=0$ and the TE dissipation in the dynamical core can be computed without diagnostics implemented in the dynamical core. 
-
-{\color{red}{any discussion on $\gi{E}^{({discr})}$}}
+This is useful if the diagnostics are not implemented in the dynamical core; in particular, if $ftype=1$ physics-dynamics coupling method is used then $\partial \gi{E}^{({pdc})}=0$ and the TE dissipation in the dynamical core can be computed without diagnostics implemented in the dynamical core. Also, \eqref{eq:pdc2} provides an alternative formula for $\partial \gi{E}^{({pdc})}$ compared to \eqref{eq:pdc}:
+\begin{equation}
+\label{eq:pdc3}
+\partial \gi{E}^{({pdc})}=-\partial \gi{E}_{phys}^{({efix})}-\partial \gi{E}_{phys}^{({pwork})}--\partial \gi{E}_{dyn}^{({adiab})} \text{ assuming }\partial \gi{E}^{({discr})}=0.
+\end{equation}
+If $\partial \gi{E}^{({pdc})}=0$ \eqref{eq:budget_efix} can be used to compute $\partial \gi{E}^{({discr})}$
+\begin{equation}
+\label{eq:discre}
+\partial \gi{E}^{({discr})}=-\partial \gi{E}_{phys}^{({efix})}-\partial \gi{E}_{phys}^{({pwork})}-\partial \gi{E}_{dyn}^{({adiab})}, \text{ assuming }\partial \gi{E}^{(pdc)}=0.
+\end{equation}
 %
 \section{Results}
 A series of simulations have been performed with CESM2.0 using CAM version 6 physics (\url{https://doi.org/10.5065/D67H1H0V}). Various configurations are used and referred to in terms of the $COMPSET$ (Component Set) value used in CESM2.0: 
@@ -433,7 +447,7 @@ A series of simulations have been performed with CESM2.0 using CAM version 6 phy
  \begin{figure}[h]
  \centering
  \includegraphics[width=35pc]{figs/dEdt.pdf}
- \caption{{\color{red}{[in note form] Note that the parameterizations have a closed energy budget so the fluctuations in the energy change due to parameterizations is balanced by fluxes in/out of the physics columns. The purpose of this Figure is to show that the energy tendency in the dynamical core is quite constant (to within ~0.2 $W/m^2$ or less); so only one month simulation may be enough to assess energy diagnostics for the dynamical core. DME adjust fluctuates with the physics forcing; obviously the energy fixers fluctuates with DME adjust. The {\em{consistency check}} (triangles) shows that the energy fixer exactly compensates for TE loss in dynamical core and dme adjust (there are no physics dynamics coupling errors in this configuration).}}{\color{blue}{reduce title font size}}}
+ \caption{{\color{red}{[in note form] Note that the parameterizations have a closed energy budget so the fluctuations in the energy change due to parameterizations is balanced by fluxes in/out of the physics columns. The purpose of this Figure is to show that the energy tendency in the dynamical core is quite constant (to within ~0.2 $W/m^2$ or less); so only one month simulation may be enough to assess energy diagnostics for the dynamical core. DME adjust fluctuates with the physics forcing; obviously the energy fixers fluctuates with DME adjust. The {\em{consistency check}} (triangles) shows that the energy fixer exactly compensates for TE loss in dynamical core and dme adjust (there are no physics dynamics coupling errors in this configuration).}}based on monthly mean values!!}
  \label{fig:dEdt(t)}
   \end{figure}
 
@@ -444,9 +458,11 @@ A series of simulations have been performed with CESM2.0 using CAM version 6 phy
 This configuration is the most energetically consistent in that the physical parameterizations and the continuous equations of motion on which the dynamical is based, conserve the same TE (defined in equation \eqref{eq:Ephys}); and there are no spurious sources/sinks in physics-dynamics coupling. Energetic consistency in dynamics and physics is obtained by setting $c_p^{(\ell)}\equiv c_p^{d}$ and $\mathcal{L}_{all}=\left\{ `d`,`wv`\right\}$ in the dynamical core equations of motion and TE computations. Namelist changes resulting in this configuration are $\tt{lcp\_moist}=.true.$, $\tt{se\_qsize\_condensate\_loading=1}$, and $\tt{ftype=1}$.
 %If the parameterizations effectively update the model state then there are no physics-dynamics coupling errors \citep[$\tt{ftype=1}$ setup described in detail in ][]{LetAl2018JAMES}. 
 
-The TE consistent configuration in AMIP-type simulation ({\em{F2000climo}}) is used to compute baseline TE tendencies which will be used to compute/compare with other model configurations/setups. First it is established how long an average is needed to get robust TE tendency estimates. Figure \ref{fig:dEdt(t)} shows $\partial \gi{E}$ for various aspects of CAM-SE as a function of time. First lets focus on the left plot. The TE tendency from parameterizations ($\partial \gi{E}^{(param)}_{phys}$) show significant variability with an amplitude of approximately 2.5$W/(m^2s)$. As noted above this term does not figure in the spurious TE budget. That said, the variability is reflected on to the TE tendency due to pressure work $\partial \gi{E}^{(pwork)}_{phys}\approx 0.3\pm 0.08 W/(m^2s)$. On the scale used in the left-hand plot the TE tendency of the adiabatic dynamical core $\partial \gi{E}^{(adiab)}_{dyn}$ does not seem to be affected by $\partial \gi{E}^{(param)}_{phys}$ or $\partial \gi{E}^{(pwork)}_{phys}$ in terms of variability, and remains stable at approximately 0.6$W/(m^2s)\pm ~0.02 W/(m^2s)$. The TE fixer, in this model configuration, fixes $\partial \gi{E}^{(adiab)}_{dyn}$ and $\partial \gi{E}^{(pwork)}_{phys}$. Since the TE in the adiabatic dynamics remains approximately constant and the TE tendency associated with pressure work has variability, the TE tendency from the $\partial \gi{E}^{(efix)}_{phys}$ has variability; $\partial \gi{E}^{(efix)}_{phys}\approx 0.3 \pm 0.08 W/(m^2s)$. As a consistency check $-\partial \gi{E}^{(adiab)}_{dyn}-\partial \gi{E}^{(pwork)}_{phys}$ is plotted with asterisk's and they coincide (as expected) with $\partial \gi{E}^{(efix)}_{phys}$.
+The TE consistent configuration in AMIP-type simulation ({\em{F2000climo}}) is used to compute baseline TE tendencies which will be used to compute/compare with other model configurations/setups. First it is established how long an average is needed to get robust TE tendency estimates. Figure \ref{fig:dEdt(t)} shows $\partial \gi{E}$ for various aspects of CAM-SE as a function of time. First lets focus on the left plot. The TE tendency from parameterizations ($\partial \gi{E}^{(param)}_{phys}$) show significant variability with an amplitude of approximately 2.5$W/(m^2s)$. As noted above this term does not figure in the spurious TE budget. That said, the variability is reflected on to the TE tendency due to pressure work $\partial \gi{E}^{(pwork)}_{phys}\approx 0.31\pm 0.08 W/(m^2s)$. On the scale used in the left-hand plot the TE tendency of the adiabatic dynamical core $\partial \gi{E}^{(adiab)}_{dyn}$ does not seem to be affected by $\partial \gi{E}^{(param)}_{phys}$ or $\partial \gi{E}^{(pwork)}_{phys}$ in terms of variability, and remains stable at approximately 0.6$W/(m^2s)\pm ~0.02 W/(m^2s)$. The TE fixer, in this model configuration, fixes $\partial \gi{E}^{(adiab)}_{dyn}$ and $\partial \gi{E}^{(pwork)}_{phys}$. Since the TE in the adiabatic dynamics remains approximately constant and the TE tendency associated with pressure work has variability, the TE tendency from the $\partial \gi{E}^{(efix)}_{phys}$ has variability; $\partial \gi{E}^{(efix)}_{phys}\approx 0.30 \pm 0.08 W/(m^2s)$. As a consistency check $-\partial \gi{E}^{(adiab)}_{dyn}-\partial \gi{E}^{(pwork)}_{phys}$ is plotted with asterisk's and they coincide (as expected) with $\partial \gi{E}^{(efix)}_{phys}$.
 
-The right-hand plot in  Figure \ref{fig:dEdt(t)} shows a breakdown of the dynamical core TE tendencies. The majority of the TE dissipation is due to hyperviscosity on temperature and pressure, $\partial \gi{E}^{(hvis)}_{dyn}\approx -0.6\pm 0.01 W/(m^2s)$. The diffusion of momentum is added back as frictional heating and is therefore not part of $\partial \gi{E}^{(hvis)}_{dyn}$. The frictional heating is a significant term in the TE tendency budget $\partial \gi{E}^{(fheat)}_{dyn}\approx 0.58\pm 0.02 W/(m^2s)$ and exhibits some variability but with a rather small amplitude. The remaining TE dissipation in the floating Lagrangian dynamics is inviscid dissipation and time-truncation errors $\partial \gi{E}_{dyn}^{(res)}=\partial \gi{E}_{dyn}^{({2D})}-\partial \gi{E}_{dyn}^{({hvis})}\approx 0.007 W/(m^2s)$. The TE tendency from vertical remapping is approximately $\partial \gi{E}_{dyn}^{({remap})}\approx -0.01 W/(m^2s)$. To within $~0.02 W/(m^2s)$ the dynamical core TE tendency terms can be computed from just one months average. The TE tendencies computed in physics exhibit more variability and are only accurate to $~0.1 W/(m^2s)$ after a one month average (excluding $\partial \gi{E}^{(param)}_{phys}$). 
+The right-hand plot in  Figure \ref{fig:dEdt(t)} shows a breakdown of the dynamical core TE tendencies. The majority of the TE dissipation is due to hyperviscosity on temperature and pressure, $\partial \gi{E}^{(hvis)}_{dyn}\approx -0.61\pm 0.01 W/(m^2s)$. The diffusion of momentum is added back as frictional heating and is therefore not part of $\partial \gi{E}^{(hvis)}_{dyn}$. The frictional heating is a significant term in the TE tendency budget $\partial \gi{E}^{(fheat)}_{dyn}\approx 0.56\pm 0.02 W/(m^2s)$ and exhibits some variability but with a rather small amplitude. The remaining TE dissipation in the floating Lagrangian dynamics is inviscid dissipation and time-truncation errors $\partial \gi{E}_{dyn}^{(res)}=\partial \gi{E}_{dyn}^{({2D})}-\partial \gi{E}_{dyn}^{({hvis})}\approx 0.007 W/(m^2s)$. The TE tendency from vertical remapping is approximately $\partial \gi{E}_{dyn}^{({remap})}\approx -0.01 W/(m^2s)$. To within $~0.02 W/(m^2s)$ the dynamical core TE tendency terms can be computed from just one months average. The TE tendencies computed in physics exhibit more variability and are only accurate to $~0.1 W/(m^2s)$ after a one month average (excluding $\partial \gi{E}^{(param)}_{phys}$). 
+
+{\color{red}{$\partial \gi{E}^{(pdc)}$ computed with \eqref{eq:pdc} is $3.709e-09$ and $\partial \gi{E}^{(pdc)}$ computed with \eqref{eq:pdc3} is $1.265e-05$. Why this discrepency? Can we consider this noise!}} 
 
 While it is advantageous to use $ftype=1$ (state-update) physics-dynamics coupling algorithm in terms if having no spurious TE tendency from coupling ($\partial \gi{E}^{({pdc})}=0$), it does results in spurious gravity waves in the simulations. For example, Figure \ref{fig:abs_dpsdt}a shows a 1 year average of $|\frac{dp_s}{dt}|$ and it clearly exhibits unphysical oscillations coinciding with element boundaries. Details of the spectral-element method, its coupling to physics and associated noise issues are discussed in detail in \citet{HetAl2018MWR}. The gravity wave noise in the solutions are even visible in the 500hPa pressure velocity annual average (Figure \ref{fig:omega500}a). This issue can be alleviated by using a shorter physics time-step so that the physics increments are smaller (not shown). Climate modelers have historically not pursued a shorter physics time-step in production configurations as climate parameterizations are computationally expensive and there is a large sensitivity to physics time-steps in the simulated climate \citep[e.g.][]{WO2003QJR,WetAl2015JAMES}.
 
@@ -460,11 +476,11 @@ The majority of the noise with $ftype=1$ physics-dynamics coupling method comes 
 
  The noise patterns in vertical velocity of the coast off the western coast of South America are present in all CAM-SE simulations (and hence not related to physics-dynamics coupling algorithm) are also `removed' by using CAM-SE-CSLAM.
 \subsubsection{Spurious TE tendencies from physics-dynamics coupling}
-When using the same TE formula in the dynamical core and physics the spurious TE tendency from physics-dynamics coupling can be assessed. Since the pressure fields evolve during `dribbling' of physics forcing the TE increments from the forcing change. For $ftype=0$ this tendency is $\partial \gi{E}^{({pdc})}=0.04 W/(m^2s)$ and thus rather small compared to the viscosity TE dissipation rates. {\color{red}{ftype=2 ???; is most of the spurious TE tendency from T/momentum?}}
+When using the same TE formula in the dynamical core and physics the spurious TE tendency from physics-dynamics coupling can be assessed. Since the pressure fields evolve during `dribbling' of physics forcing the TE increments from the forcing change. For $ftype=0$ and $ftype=2$ this tendency is $\partial \gi{E}^{({pdc})}=-0.05 W/(m^2s)$ and thus rather small compared to the viscosity TE dissipation rates. Since $\partial \gi{E}^{({pdc})}$ are the same (to the second digit) for $ftype=0$ and $ftype=2$ it is the momentum and temperature `dribbling' errors that dominate $\partial \gi{E}^{({pdc})}$.
 \subsection{Limiters on vertical remapping and TE}
 \subsection{No topography}
-
-
+When running the model in Aqua-planet mode one can assess the effect simplifying the surface boundary condition. In particular, without topography forcing the dynamical core is not challenges with respect to stationary near-grid-scale forcing. The TE tendency with respect to pressure work remains the same $\partial \gi{E}_{phys}^{({pwork})}$ as the AMIP-tpe simulations, however, the adiabatic dynamical core TE tendency resudes to $\partial \gi{E}_{dyn}^{({adiab})}=-0.14 W/(M^2s)$. Most of that reduction is due to viscosity $\partial \gi{E}_{dyn}^{(hvis)}=-0.13 W/(M^2s)$. The frictional heating is roughtly the same as AMIP $\partial \gi{E}_{dyn}^{(fheat)}=0.48 W/(m^2s)$ as is the vertical remapping  $\partial \gi{E}_{dyn}^{(remap)}=-0.01 W/(m^2s)$. To evaluate the dynamical cores diffusion of TE it is therefore important to asses the model in a configuration with topopgrahy as the wave dynamics generated topography leads to more active diffusion operators.
+\subsection{Held-Suarez: no moist physics}
 
 
  \begin{figure}[h]
