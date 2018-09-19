@@ -1,0 +1,104 @@
+(seq_mct_drv) USE_ESMF_LIB is NOT set, using esmf_wrf_timemgr
+(seq_mct_drv) MCT_INTERFACE is set
+ CPL              : pio_numiotasks =           56
+ CPL              : pio_stride =           36
+ CPL              : pio_root =            1
+ CPL              : pio_iotype =            5
+ ATM              : pio_numiotasks =           56
+ ATM              : pio_stride =           36
+ ATM              : pio_root =            1
+ ATM              : pio_iotype =            5
+ LND              : pio_numiotasks =           56
+ LND              : pio_stride =           36
+ LND              : pio_root =            1
+ LND              : pio_iotype =            5
+ OCN              : pio_numiotasks =           56
+ OCN              : pio_stride =           36
+ OCN              : pio_root =            1
+ OCN              : pio_iotype =            5
+ ICE              : pio_numiotasks =           56
+ ICE              : pio_stride =           36
+ ICE              : pio_root =            1
+ ICE              : pio_iotype =            5
+ GLC              : pio_numiotasks =           56
+ GLC              : pio_stride =           36
+ GLC              : pio_root =            1
+ GLC              : pio_iotype =            5
+ ROF              : pio_numiotasks =           56
+ ROF              : pio_stride =           36
+ ROF              : pio_root =            1
+ ROF              : pio_iotype =            5
+ WAV              : pio_numiotasks =           56
+ WAV              : pio_stride =           36
+ WAV              : pio_root =            1
+ WAV              : pio_iotype =            5
+ ESP              : pio_numiotasks =            4
+ ESP              : pio_stride =          504
+ ESP              : pio_root =            1
+ ESP              : pio_iotype =            6
+ CPL              : pio_numiotasks =           56
+ CPL              : pio_stride =           36
+ CPL              : pio_rearranger =            1
+ CPL              : pio_root =            1
+ CPL              : pio_iotype =            5
+ ATM              : pio_numiotasks =           56
+ ATM              : pio_stride =           36
+ ATM              : pio_rearranger =            1
+ ATM              : pio_root =            1
+ ATM              : pio_iotype =            5
+ LND              : pio_numiotasks =           56
+ LND              : pio_stride =           36
+ LND              : pio_rearranger =            1
+ LND              : pio_root =            1
+ LND              : pio_iotype =            5
+ OCN              : pio_numiotasks =           56
+ OCN              : pio_stride =           36
+ OCN              : pio_rearranger =            1
+ OCN              : pio_root =            1
+ OCN              : pio_iotype =            5
+ ICE              : pio_numiotasks =           56
+ ICE              : pio_stride =           36
+ ICE              : pio_rearranger =            1
+ ICE              : pio_root =            1
+ ICE              : pio_iotype =            5
+ GLC              : pio_numiotasks =           56
+ GLC              : pio_stride =           36
+ GLC              : pio_rearranger =            1
+ GLC              : pio_root =            1
+ GLC              : pio_iotype =            5
+ ROF              : pio_numiotasks =           56
+ ROF              : pio_stride =           36
+ ROF              : pio_rearranger =            1
+ ROF              : pio_root =            1
+ ROF              : pio_iotype =            5
+ WAV              : pio_numiotasks =           56
+ WAV              : pio_stride =           36
+ WAV              : pio_rearranger =            1
+ WAV              : pio_root =            1
+ WAV              : pio_iotype =            5
+ ESP              : pio_numiotasks =            4
+ ESP              : pio_stride =          504
+ ESP              : pio_rearranger =            1
+ ESP              : pio_root =            1
+ ESP              : pio_iotype =            6
+8 MB memory   alloc in MB is             8.00
+8 MB memory dealloc in MB is             7.96
+Memory block size conversion in bytes is          4092.00
+(seq_infodata_Init) 
+ read seq_infodata_inparm namelist from: drv_in
+(shr_orb_params) Calculate characteristics of the orbit:
+(shr_orb_params) Calculate orbit for year:      2000
+(shr_orb_params) ------ Computed Orbital Parameters ------
+(shr_orb_params) Eccentricity      =   1.670366E-02
+(shr_orb_params) Obliquity (deg)   =   2.343977E+01
+(shr_orb_params) Obliquity (rad)   =   4.091011E-01
+(shr_orb_params) Long of perh(deg) =   1.028955E+02
+(shr_orb_params) Long of perh(rad) =   4.937458E+00
+(shr_orb_params) Long at v.e.(rad) =  -3.247250E-02
+(shr_orb_params) -----------------------------------------
+(seq_infodata_Init)  read rpointer file rpointer.drv
+(seq_infodata_Init)  restart file from rpointer= b.e20.BHIST.f09_g17.20thC.297_01_v2.cpl.r.2000-01-01-00000.nc
+(seq_infodata_Check)  case_name =trunk-F2000climo-fv-30yrs-C60topo: rest_case_name =b.e20.BHIST.f09_g17.20thC.297_01:
+ ERROR: 
+ (seq_infodata_Check) : invalid continue restart case name = b.e20.BHIST.f09_g17
+ .20thC.297_01

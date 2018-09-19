@@ -1,0 +1,179 @@
+0: Invalid PIO rearranger comm max pend req (comp2io),            0
+0: Resetting PIO rearranger comm max pend req (comp2io) to           64
+0: PIO rearranger options:
+0:   comm type     =
+0: p2p                                                                            
+0:  
+0:   comm fcd      =
+0: 2denable                                                                       
+0:  
+0:   max pend req (comp2io)  =           0
+0:   enable_hs (comp2io)     = T
+0:   enable_isend (comp2io)  = F
+0:   max pend req (io2comp)  =          64
+0:   enable_hs (io2comp)    = F
+0:   enable_isend (io2comp)  = T
+0:(seq_comm_setcomm)  init ID (  1 GLOBAL          ) pelist   =     0  2015     1 ( npes =  2016) ( nthreads =  1)( suffix =)
+0:(seq_comm_setcomm)  init ID (  2 CPL             ) pelist   =     0  2015     1 ( npes =  2016) ( nthreads =  3)( suffix =)
+0:(seq_comm_setcomm)  init ID (  5 ATM             ) pelist   =     0  2015     1 ( npes =  2016) ( nthreads =  3)( suffix =)
+0:(seq_comm_joincomm) init ID (  6 CPLATM          ) join IDs =     2     5       ( npes =  2016) ( nthreads =  3)
+0:(seq_comm_jcommarr) init ID (  3 ALLATMID        ) join multiple comp IDs       ( npes =  2016) ( nthreads =  3)
+0:(seq_comm_joincomm) init ID (  4 CPLALLATMID     ) join IDs =     2     3       ( npes =  2016) ( nthreads =  3)
+0:(seq_comm_setcomm)  init ID (  9 LND             ) pelist   =     0  2015     1 ( npes =  2016) ( nthreads =  3)( suffix =)
+0:(seq_comm_joincomm) init ID ( 10 CPLLND          ) join IDs =     2     9       ( npes =  2016) ( nthreads =  3)
+0:(seq_comm_jcommarr) init ID (  7 ALLLNDID        ) join multiple comp IDs       ( npes =  2016) ( nthreads =  3)
+0:(seq_comm_joincomm) init ID (  8 CPLALLLNDID     ) join IDs =     2     7       ( npes =  2016) ( nthreads =  3)
+0:(seq_comm_setcomm)  init ID ( 13 ICE             ) pelist   =     0  2015     1 ( npes =  2016) ( nthreads =  3)( suffix =)
+0:(seq_comm_joincomm) init ID ( 14 CPLICE          ) join IDs =     2    13       ( npes =  2016) ( nthreads =  3)
+0:(seq_comm_jcommarr) init ID ( 11 ALLICEID        ) join multiple comp IDs       ( npes =  2016) ( nthreads =  3)
+0:(seq_comm_joincomm) init ID ( 12 CPLALLICEID     ) join IDs =     2    11       ( npes =  2016) ( nthreads =  3)
+0:(seq_comm_setcomm)  init ID ( 17 OCN             ) pelist   =     0  2015     1 ( npes =  2016) ( nthreads =  3)( suffix =)
+0:(seq_comm_joincomm) init ID ( 18 CPLOCN          ) join IDs =     2    17       ( npes =  2016) ( nthreads =  3)
+0:(seq_comm_jcommarr) init ID ( 15 ALLOCNID        ) join multiple comp IDs       ( npes =  2016) ( nthreads =  3)
+0:(seq_comm_joincomm) init ID ( 16 CPLALLOCNID     ) join IDs =     2    15       ( npes =  2016) ( nthreads =  3)
+0:(seq_comm_setcomm)  init ID ( 21 ROF             ) pelist   =     0  2015     1 ( npes =  2016) ( nthreads =  3)( suffix =)
+0:(seq_comm_joincomm) init ID ( 22 CPLROF          ) join IDs =     2    21       ( npes =  2016) ( nthreads =  3)
+0:(seq_comm_jcommarr) init ID ( 19 ALLROFID        ) join multiple comp IDs       ( npes =  2016) ( nthreads =  3)
+0:(seq_comm_joincomm) init ID ( 20 CPLALLROFID     ) join IDs =     2    19       ( npes =  2016) ( nthreads =  3)
+0:(seq_comm_setcomm)  init ID ( 25 GLC             ) pelist   =     0  2015     1 ( npes =  2016) ( nthreads =  3)( suffix =)
+0:(seq_comm_joincomm) init ID ( 26 CPLGLC          ) join IDs =     2    25       ( npes =  2016) ( nthreads =  3)
+0:(seq_comm_jcommarr) init ID ( 23 ALLGLCID        ) join multiple comp IDs       ( npes =  2016) ( nthreads =  3)
+0:(seq_comm_joincomm) init ID ( 24 CPLALLGLCID     ) join IDs =     2    23       ( npes =  2016) ( nthreads =  3)
+0:(seq_comm_setcomm)  init ID ( 29 WAV             ) pelist   =     0  2015     1 ( npes =  2016) ( nthreads =  3)( suffix =)
+0:(seq_comm_joincomm) init ID ( 30 CPLWAV          ) join IDs =     2    29       ( npes =  2016) ( nthreads =  3)
+0:(seq_comm_jcommarr) init ID ( 27 ALLWAVID        ) join multiple comp IDs       ( npes =  2016) ( nthreads =  3)
+0:(seq_comm_joincomm) init ID ( 28 CPLALLWAVID     ) join IDs =     2    27       ( npes =  2016) ( nthreads =  3)
+0:(seq_comm_setcomm)  init ID ( 33 ESP             ) pelist   =     0  2015     1 ( npes =  2016) ( nthreads =  1)( suffix =)
+0:(seq_comm_joincomm) init ID ( 34 CPLESP          ) join IDs =     2    33       ( npes =  2016) ( nthreads =  3)
+0:(seq_comm_jcommarr) init ID ( 31 ALLESPID        ) join multiple comp IDs       ( npes =  2016) ( nthreads =  1)
+0:(seq_comm_joincomm) init ID ( 32 CPLALLESPID     ) join IDs =     2    31       ( npes =  2016) ( nthreads =  3)
+0:(seq_comm_printcomms)     1     0  2016     1  GLOBAL:
+0:(seq_comm_printcomms)     2     0  2016     3  CPL:
+0:(seq_comm_printcomms)     3     0  2016     3  ALLATMID:
+0:(seq_comm_printcomms)     4     0  2016     3  CPLALLATMID:
+0:(seq_comm_printcomms)     5     0  2016     3  ATM:
+0:(seq_comm_printcomms)     6     0  2016     3  CPLATM:
+0:(seq_comm_printcomms)     7     0  2016     3  ALLLNDID:
+0:(seq_comm_printcomms)     8     0  2016     3  CPLALLLNDID:
+0:(seq_comm_printcomms)     9     0  2016     3  LND:
+0:(seq_comm_printcomms)    10     0  2016     3  CPLLND:
+0:(seq_comm_printcomms)    11     0  2016     3  ALLICEID:
+0:(seq_comm_printcomms)    12     0  2016     3  CPLALLICEID:
+0:(seq_comm_printcomms)    13     0  2016     3  ICE:
+0:(seq_comm_printcomms)    14     0  2016     3  CPLICE:
+0:(seq_comm_printcomms)    15     0  2016     3  ALLOCNID:
+0:(seq_comm_printcomms)    16     0  2016     3  CPLALLOCNID:
+0:(seq_comm_printcomms)    17     0  2016     3  OCN:
+0:(seq_comm_printcomms)    18     0  2016     3  CPLOCN:
+0:(seq_comm_printcomms)    19     0  2016     3  ALLROFID:
+0:(seq_comm_printcomms)    20     0  2016     3  CPLALLROFID:
+0:(seq_comm_printcomms)    21     0  2016     3  ROF:
+0:(seq_comm_printcomms)    22     0  2016     3  CPLROF:
+0:(seq_comm_printcomms)    23     0  2016     3  ALLGLCID:
+0:(seq_comm_printcomms)    24     0  2016     3  CPLALLGLCID:
+0:(seq_comm_printcomms)    25     0  2016     3  GLC:
+0:(seq_comm_printcomms)    26     0  2016     3  CPLGLC:
+0:(seq_comm_printcomms)    27     0  2016     3  ALLWAVID:
+0:(seq_comm_printcomms)    28     0  2016     3  CPLALLWAVID:
+0:(seq_comm_printcomms)    29     0  2016     3  WAV:
+0:(seq_comm_printcomms)    30     0  2016     3  CPLWAV:
+0:(seq_comm_printcomms)    31     0  2016     1  ALLESPID:
+0:(seq_comm_printcomms)    32     0  2016     3  CPLALLESPID:
+0:(seq_comm_printcomms)    33     0  2016     1  ESP:
+0:(seq_comm_printcomms)    34     0  2016     3  CPLESP:
+1: Setting mpi info: ibm_largeblock_io=true
+1: Setting mpi info: ibm_largeblock_io=true
+1: Setting mpi info: ibm_largeblock_io=true
+1: Setting mpi info: ibm_largeblock_io=true
+1: Setting mpi info: ibm_largeblock_io=true
+1: Setting mpi info: ibm_largeblock_io=true
+1: Setting mpi info: ibm_largeblock_io=true
+1: Setting mpi info: ibm_largeblock_io=true
+1: Setting mpi info: ibm_largeblock_io=true
+0: (t_initf) Read in prof_inparm namelist from: drv_in
+0: (t_initf) Using profile_disable=          F
+0: (t_initf)       profile_timer=                      4
+0: (t_initf)       profile_depth_limit=                4
+0: (t_initf)       profile_detail_limit=               2
+0: (t_initf)       profile_barrier=          F
+0: (t_initf)       profile_outpe_num=                  1
+0: (t_initf)       profile_outpe_stride=               0
+0: (t_initf)       profile_single_file=      F
+0: (t_initf)       profile_global_stats=     T
+0: (t_initf)       profile_ovhd_measurement= F
+0: (t_initf)       profile_add_detail=       F
+0: (t_initf)       profile_papi_enable=      F
+0: ERROR: 
+0: (seq_infodata_Check) : invalid continue restart case name = b.e20.BHIST.f09_g17
+0: .20thC.297_01
+0:Image              PC                Routine            Line        Source             
+0:cesm.exe           0000000003769D2D  Unknown               Unknown  Unknown
+0:cesm.exe           0000000002ED2166  shr_abort_mod_mp_         114  shr_abort_mod.F90
+0:cesm.exe           0000000002EAFB7B  seq_infodata_mod_        2737  seq_infodata_mod.F90
+0:cesm.exe           0000000002EB1532  seq_infodata_mod_         888  seq_infodata_mod.F90
+0:cesm.exe           00000000004235C9  cime_comp_mod_mp_         856  cime_comp_mod.F90
+0:cesm.exe           000000000042519B  MAIN__                     76  cime_driver.F90
+0:cesm.exe           00000000004092DE  Unknown               Unknown  Unknown
+0:libc-2.19.so       00002AAAB04DCB25  __libc_start_main     Unknown  Unknown
+0:cesm.exe           00000000004091E9  Unknown               Unknown  Unknown
+0:MPT ERROR: Rank 0(g:0) is aborting with error code 1001.
+0:	Process ID: 45484, Host: r1i1n33, Program: /gpfs/fs1/scratch/pel/trunk-F2000climo-fv-30yrs-C60topo/bld/cesm.exe
+0:	MPT Version: HPE MPT 2.16  05/03/17 01:07:48
+0:
+0:MPT: --------stack traceback-------
+0:MPT: Attaching to program: /proc/45484/exe, process 45484
+0:MPT: done.
+0:MPT: Try: zypper install -C "debuginfo(build-id)=3d290be00d48b823d3b71df2249e80d881bc473d"
+0:MPT: (no debugging symbols found)...done.
+0:MPT: Try: zypper install -C "debuginfo(build-id)=5409c48fdb15e90649c1407e444fbe31d6dc8ec1"
+0:MPT: (no debugging symbols found)...done.
+0:MPT: [Thread debugging using libthread_db enabled]
+0:MPT: Using host libthread_db library "/glade/u/apps/ch/os/lib64/libthread_db.so.1".
+0:MPT: Try: zypper install -C "debuginfo(build-id)=e97cfdb062d6f0c41073f2109a7605d0ae991c03"
+0:MPT: (no debugging symbols found)...done.
+0:MPT: Try: zypper install -C "debuginfo(build-id)=f43d7754940a14ffe3d9bd8fc9472ffbbfead544"
+0:MPT: (no debugging symbols found)...done.
+0:MPT: Try: zypper install -C "debuginfo(build-id)=0ea764119690f32c98faae9a63a73f35ed8b1099"
+0:MPT: (no debugging symbols found)...done.
+0:MPT: Try: zypper install -C "debuginfo(build-id)=15916519d9dbaea26ec88427460b4cedb9c0a6ab"
+0:MPT: (no debugging symbols found)...done.
+0:MPT: Try: zypper install -C "debuginfo(build-id)=79264652a62453da222372a430cd9351d4bbcbde"
+0:MPT: (no debugging symbols found)...done.
+0:MPT: Try: zypper install -C "debuginfo(build-id)=68682e9ac223d269cbecb94315fcec5e16b32bfb"
+0:MPT: (no debugging symbols found)...done.
+0:MPT: 0x00002aaaafac141c in waitpid () from /glade/u/apps/ch/os/lib64/libpthread.so.0
+0:MPT: Missing separate debuginfos, use: zypper install glibc-debuginfo-2.19-35.1.x86_64
+0:MPT: (gdb) #0  0x00002aaaafac141c in waitpid ()
+0:MPT:    from /glade/u/apps/ch/os/lib64/libpthread.so.0
+0:MPT: #1  0x00002aaab01f2576 in mpi_sgi_system (
+0:MPT: #2  MPI_SGI_stacktraceback (
+0:MPT:     header=header@entry=0x7fffffff3b40 "MPT ERROR: Rank 0(g:0) is aborting with error code 1001.\n\tProcess ID: 45484, Host: r1i1n33, Program: /gpfs/fs1/scratch/pel/trunk-F2000climo-fv-30yrs-C60topo/bld/cesm.exe\n\tMPT Version: HPE MPT 2.16  05"...) at sig.c:339
+0:MPT: #3  0x00002aaab0141cdf in print_traceback (ecode=ecode@entry=1001)
+0:MPT:     at abort.c:238
+0:MPT: #4  0x00002aaab0141f4a in PMPI_Abort (comm=<optimized out>, errorcode=1001)
+0:MPT:     at abort.c:67
+0:MPT: #5  0x00002aaab014222c in pmpi_abort__ ()
+0:MPT:    from /glade/u/apps/ch/opt/mpt/2.16/lib/libmpi.so
+0:MPT: #6  0x0000000002fd7579 in shr_mpi_mod_mp_shr_mpi_abort_ ()
+0:MPT:     at /gpfs/u/home/pel/src/trunk/cime/src/share/util/shr_mpi_mod.F90:2127
+0:MPT: #7  0x0000000002ed220e in shr_abort_mod_mp_shr_abort_abort_ ()
+0:MPT:     at /gpfs/u/home/pel/src/trunk/cime/src/share/util/shr_abort_mod.F90:69
+0:MPT: #8  0x0000000002eafb7b in seq_infodata_mod_mp_seq_infodata_check_ ()
+0:MPT:     at /gpfs/u/home/pel/src/trunk/cime/src/drivers/mct/shr/seq_infodata_mod.F90:2737
+0:MPT: #9  0x0000000002eb1532 in seq_infodata_mod_mp_seq_infodata_init_ ()
+0:MPT:     at /gpfs/u/home/pel/src/trunk/cime/src/drivers/mct/shr/seq_infodata_mod.F90:888
+0:MPT: #10 0x00000000004235c9 in cime_comp_mod_mp_cime_pre_init2_ ()
+0:MPT:     at /gpfs/u/home/pel/src/trunk/cime/src/drivers/mct/main/cime_comp_mod.F90:856
+0:MPT: #11 0x000000000042519b in MAIN__ ()
+0:MPT:     at /gpfs/u/home/pel/src/trunk/cime/src/drivers/mct/main/cime_driver.F90:76
+0:MPT: #12 0x00000000004092de in main ()
+0:MPT: (gdb) A debugging session is active.
+0:MPT: 
+0:MPT: 	Inferior 1 [process 45484] will be detached.
+0:MPT: 
+0:MPT: Quit anyway? (y or n) [answered Y; input not from terminal]
+0:MPT: Detaching from program: /proc/45484/exe, process 45484
+0:
+0:MPT: -----stack traceback ends-----
+-1:MPT ERROR: MPI_COMM_WORLD rank 0 has terminated without calling MPI_Finalize()
+-1:	aborting job
