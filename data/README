@@ -2,3 +2,8 @@ The data provided in the directories energy and other-flds are used to
 compute entries in Table 1 and Figure 3 and 4.
 
 The filenames match the `Descriptor' column in Table 1.
+
+Run energy diagnostics:
+
+1. go to case, e.g. "cd cslam"
+2. source ../ncl/te_budgets.sh cslam.TE.ave.nc
