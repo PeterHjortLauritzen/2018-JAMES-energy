@@ -473,19 +473,21 @@ A series of simulations have been performed with CESM2.1 using CAM version 6 (CA
 
 Various configurations are used and referred to in terms of the $COMPSET$ (Component Set) value used in CESM2.1 The $COMPSET$ {\em{F2000climo}} configuration refers to `real-world' AMIP (Atmospheric Model Intercomparison Project) type simulations using perpetual year 2000 SST (Sea Surface Temperature) boundary conditions. The first 7 simulations in the table (those above the horizontal line) are such AMIP-type simulations (F2000climo) with the first serving as a control for the 6 following variants. The remaining 5 simulation descriptors (below the horizontal line in Table \ref{table:TE}) list their $COMPSET$ or dynamical core settings.
 
+{\color{red}{The different configurations listed below are chosen to assess different aspects of the dynamical core numerical algorithm, PDC method, surface conditions, etc. (pointed out in parenthesis at the end of each item listing) on the TE budget:}}
+
 \begin{itemize}
-\item {\em{TE consistent}}: The TE consistent version uses {\em{state update}} physics-dynamics coupling ({\tt{ftype 1}}) described in section \ref{sec:consistent},
-\item {\em{`dribbling' A}}: as {\em{TE consistent}} but with {\em{dribbling}} physics-dynamics coupling ({\tt{ftype 0}}) (section \ref{se:pdc_problem}),
-\item {\em{`dribbling' B}}: as {\em{TE consistent}} but with  {\em{dribbling}} combination physics-dynamics coupling ({\tt{ftype 2}}) (section \ref{se:pdc_problem}),
-\item {\em{vert limiter}}: as {\em{TE consistent}} but using limiters in the vertical remapping of momentum (section \ref{sec:ppm}),
-\item {\em{smooth topo}}: as {\em{TE consistent}} but  using smoother topography (see section \ref{sec:topo}),
-\item {\em{energy discr}}: The version with energy discrepancy (but no physics-dynamics coupling errors) described in section \ref{sec:ediscr},
-\item {\em{default}}: as {\em{energy discr}} version but with {\tt{ftype=2}} which is the current default CAM-SE (section \ref{sec:ediscr}),
-\item {\em{QPC6}}: A simplified aqua-planet setup based on the {\em{TE consistent}}, i.e an aqua-planet setup using CAM6 physics; an ocean covered planet in perpetual equinox, with fixed, zonally symmetric sea surface temperatures \citep{NH2000ASL,MWO2016JAMES} (section \ref{sec:QPC6}), 
-\item {\em{FSH94}}: Dry dynamical core configuration based on Held-Suarez forcing which relaxes temperature to a zonally symmetric equilibrium temperature profile and simple linear drag at the lower boundary \citep{HS1994BAMS} (section \ref{sec:FHS94}),. 
-\item {\em{FV}}: A configuration with the SE dynamical core replaced with the finite-volume core (section \ref{sec:cam-fv}), and
-\item {\em{CSLAM}}: The quasi equal-area physics grid configuration of CAM-SE based on the TE consistent setup (section \ref{sec:cslam})
-\item {\em{CSLAM default}}: Same as {\em{CSLAM}} configuration but with {\tt{ftype=2}} and all forms of water thermodynamically{\color{red}{/inertially}} active in the dynamical core.
+\item {\em{TE consistent}}: The TE consistent version uses {\em{state update}} physics-dynamics coupling ({\tt{ftype 1}}) described in section \ref{sec:consistent} {\color{red}{(this configuration does not have PDC errors and the same TE definition in physics and dynamics; and hence the enegetically most consistent setup)}},
+\item {\em{`dribbling' A}}: as {\em{TE consistent}} but with {\em{dribbling}} physics-dynamics coupling ({\tt{ftype 0}}) (section \ref{se:pdc_problem}{\color{red}{; this setup is used to assess PDC errors)}},
+\item {\em{`dribbling' B}}: as {\em{TE consistent}} but with  {\em{dribbling}} combination physics-dynamics coupling ({\tt{ftype 2}}) (section \ref{se:pdc_problem}{\color{red}{; this setup is used to assess PDC errors)}},
+\item {\em{vert limiter}}: as {\em{TE consistent}} but using limiters in the vertical remapping of momentum (section \ref{sec:ppm}{\color{red}{; experiment used to assess TE errors associated with shape-preserving limiters in vertical remapping}}),
+\item {\em{smooth topo}}: as {\em{TE consistent}} but  using smoother topography (see section \ref{sec:topo}{\color{red}{experiement used to assess TE sensitivity to surface roughness}}),
+\item {\em{energy discr}}: The version with energy discrepancy (but no physics-dynamics coupling errors) described in section \ref{sec:ediscr} {\color{red}{(experiment used to estimate energy discrepancy errors)}},
+\item {\em{default}}: as {\em{energy discr}} version but with {\tt{ftype=2}} which is the current default CAM-SE (section \ref{sec:ediscr}{\color{red}{; we assess this configuration as it is the default CAM-SE configuration}}),
+\item {\em{QPC6}}: A simplified aqua-planet setup based on the {\em{TE consistent}}, i.e an aqua-planet setup using CAM6 physics; an ocean covered planet in perpetual equinox, with fixed, zonally symmetric sea surface temperatures \citep{NH2000ASL,MWO2016JAMES} (section \ref{sec:QPC6}{\color{red}{; experiment use to assess TE errors in a simplified moist environment}}), 
+\item {\em{FSH94}}: Dry dynamical core configuration based on Held-Suarez forcing which relaxes temperature to a zonally symmetric equilibrium temperature profile and simple linear drag at the lower boundary \citep{HS1994BAMS} (section \ref{sec:FHS94}{\color{red}{; experiment used to assess if TE errors in on of the simplest climate test cases is representative of full model TE errors}}),. 
+\item {\em{FV}}: A configuration with the SE dynamical core replaced with the finite-volume core (section \ref{sec:cam-fv}{\color{red}{experiment used to assess TE errors of the `workhorse' dynamical core for CMIP6 simulations}}), and
+\item {\em{CSLAM}}: The quasi equal-area physics grid configuration of CAM-SE based on the TE consistent setup (section \ref{sec:cslam}{\color{red}{; used to assess TE errors associated with separating the dynamics grid from the physics grid}})
+\item {\em{CSLAM default}}: Same as {\em{CSLAM}} configuration but with {\tt{ftype=2}} and all forms of water thermodynamically{\color{red}{/inertially}} active in the dynamical core {\color{red}{(setup evaluated since it is the default CAM-SE-CSLAM setup)}}.
 \end{itemize}
 
 
