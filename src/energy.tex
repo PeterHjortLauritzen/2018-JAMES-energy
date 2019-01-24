@@ -254,7 +254,7 @@ Define associated heat capacities at constant pressure $c_p^{(\ell)}$. {\color{r
 
 Using the $\eta^{(d)}$ vertical coordinate and dry mixing ratios the TE (per unit area) that the frictionless adiabatic equations of motion in the CAM-SE dynamical core conserves is
 \begin{equation}
-\gi{E}_{dyn}=\frac{1}{\Delta \mathcal{S}}\int_{\eta=0}^{\eta=1} \iint_\mathcal{S} \left( \frac{1}{g}\frac{\partial M^{(d)}}{\partial \eta^{(d)}} \right)\sum_{\ell \in \mathcal{L}_{all}} \left[m^{(\ell)} \left(K+c_p^{(\ell)}T+\Phi_s  \right)\right]  dA d \eta^{(d)},\label{eq:comprehensice_energy}
+\gi{E}_{dyn}=\frac{1}{\Delta \mathcal{S}}\int_{\eta=0}^{\eta=1} \iint_\mathcal{S} \left( \frac{1}{{\color{red}{g}}}\frac{\partial M^{(d)}}{\partial \eta^{(d)}} \right)\sum_{\ell \in \mathcal{L}_{all}} \left[m^{(\ell)} \left(K+c_p^{(\ell)}T+\Phi_s  \right)\right]  dA d \eta^{(d)},\label{eq:comprehensice_energy}
 \end{equation}
 where $\Delta \mathcal{S}$ is the surface area of the sphere, $\Phi_s$ is the surface geopotential and $\gi{(\cdot)}$ refers to the global average.
 
@@ -510,6 +510,40 @@ The TE consistent configuration in AMIP-type simulation ({\em{F2000climo}}) is u
 
 The right-hand plot in  Figure \ref{fig:dEdt(t)} shows a breakdown of the dynamical core TE tendencies. The majority of the TE errors are due to hyperviscosity on temperature and pressure, $\partial \gi{E}^{(hvis)}_{dyn}\approx -0.61\pm 0.01 W/m^2$. The diffusion of momentum is added back as frictional heating and is therefore not part of $\partial \gi{E}^{(hvis)}_{dyn}$. The frictional heating is a significant term in the TE tendency budget $\partial \gi{E}^{(fheat)}_{dyn}\approx 0.56\pm 0.02 W/m^2$ and exhibits some variability but with a rather small amplitude. The remaining TE error in the floating Lagrangian dynamics is inviscid dissipation and time-truncation errors $\partial \gi{E}_{dyn}^{(res)}=\partial \gi{E}_{dyn}^{({2D})}-\partial \gi{E}_{dyn}^{({hvis})}\approx 0.007 W/m^2$. The TE tendency from vertical remapping is approximately $\partial \gi{E}_{dyn}^{({remap})}\approx -0.01 W/m^2$. To within $\sim 0.02 W/m^2$ the dynamical core TE tendency terms can be computed from just one month average TE integrals. The TE tendencies computed in physics, excluding $\partial \gi{E}^{(param)}_{phys}$, exhibit more variability and are only accurate to $\sim 0.1 W/m^2$ after a one month average.
 
+
+ \begin{sidewaysfigure}
+ \centering
+ \includegraphics[width=45pc]{abs_dpsdt.pdf}
+ \caption{One year average of the absolute surface pressure tendency for (a) the TE consistent configuration, (b) `dribbling' physics-dynamics coupling, (c) {\tt{ftype=2}} physics-dynamics coupling and (d) CSLAM version of CAM-SE, respectively. (a) has a closed physics-dynamics coupling budget but spurious noise, (b) has no spurious noise but the mass-budget in physics-dynamics coupling is not closed (see Figure \ref{fig:pdc}), (c) has a closed mass budget in physics-dynamics coupling but some spurious noise at element boundaries which is eliminated when using CAM-SE-CSLAM (d). Note, the smallest value in panel (a) is the largest in panels (b), (c) and (d).}
+ \label{fig:abs_dpsdt}
+  \end{sidewaysfigure}
+
+
+ \begin{sidewaysfigure}
+ \centering
+ \includegraphics[width=45pc]{omega500.pdf}
+ \caption{Same as Figure \ref{fig:abs_dpsdt} but for 500hPa vertical pressure velocity. Note the ringing patterns off the West coast of South America and around the Himalayas in CAM-SE (a-c) that are eliminated with CAM-SE-CSLAM (d) that makes use of a quasi equal-area physics grid.}
+ \label{fig:omega500}
+  \end{sidewaysfigure}
+
+ \begin{figure}[h]
+ \centering
+ \includegraphics[width=35pc]{ftype_schematic.pdf}
+ \caption{A schematic of state-update ({\tt{ftype=1}}; row 1) and `dribbling' ({\tt{ftype=0}}; row 2) physics-dynamics coupling algorithms. See Section \ref{se:pdc_problem} for details.}
+ \label{fig:ftype_schematic}
+  \end{figure}
+
+
+
+ \begin{sidewaysfigure}
+ \centering
+ \includegraphics[width=55pc]{pdc.pdf}
+ \caption{One year average of mass [$kg/m^2$] `clipped' in physics-dynamics coupling (so that state is not driven negative) when using {\tt{ftype=0}} (`dribbling') physics-dynamics coupling for (a) water vapor, (b) cloud liquid and (c) cloud ice, respectively. Interestingly the element boundaries systematically show in the plots which is likely related to the anisotropy of the quadrature grid \citep{HetAl2018MWR}.}
+ \label{fig:pdc}
+  \end{sidewaysfigure}
+
+
+
 While it is advantageous to use {\em{state-update}} physics-dynamics coupling algorithm ({\tt{ftype=1}}) in terms of having no spurious TE tendency from coupling, $\partial \gi{E}^{({pdc})}=0$, it does result in spurious gravity waves in the simulations \cite[see, e.g., Figure 5 in ][]{GetAl2018MWR}. Figure \ref{fig:abs_dpsdt}a shows a 1 year average of $|\frac{dp_s}{dt}|$, a measure of high frequency gravity wave noise. It clearly exhibits unphysical oscillations coinciding with element boundaries. Details of the spectral-element method, its coupling to physics and associated noise issues are discussed in detail in \citet{HetAl2018MWR}. The noise in the solutions is even visible in the 500hPa pressure velocity annual average (Figure \ref{fig:omega500}a). This issue can be alleviated by using a shorter physics time-step so that the physics increments are smaller (not shown). Climate modelers have historically not pursued a shorter physics time-step in production configurations as climate parameterizations are computationally expensive and there is a large sensitivity to physics time-steps in the simulated climate \citep[e.g.][]{WO2003QJR,WetAl2015JAMES}.
 
 \subsection{{\em{`dribbling' A/B}}: Non-TE conservative physics-dynamics coupling ({\tt{ftype=0,2}})}\label{se:pdc_problem}
@@ -547,6 +581,23 @@ The default version of CAM-SE uses this configuration but with {\em{combination}
 \end{equation}
 using \eqref{eq:budget_efix}. With {\em{state-updating}} ({\tt{ftype=1}}) (i.e. $\partial \gi{E}^{({pdc})}=0$) the energy discrepancy error was 0.594$W/m^2$ and in the energy consistent setup (i.e. $\partial \gi{E}^{({discr})}=0$) but using {\em{dribbling}} ({\tt{ftype=2}}) we got $\partial \gi{E}^{({pdc})}=0.484W/m^2$. So if the physics-dynamics coupling errors and energy discrepancy errors in the different configurations would be additive, one would have expected $\partial \gi{E}^{({pdc})}+\partial \gi{E}^{({discr})}$ to be over $1W/m^2$ which is clearly not the case \eqref{eq:sum}. Again, it must be concluded that there are canceling errors in the system.
 
+{\color{red}{
+\subsubsection{2D structure of TE errors}
+Figure \ref{fig:2d_te} shows the two-dimensional spatial structure of column-integrated TE tendencies for for the {\em{default}} configuration. The first plot (Figure \ref{fig:2d_te}a) shows column integrated $\partial E^{(param)}$, i.e. the spatial structure of `physical' TE tendency. Only contours from $\pm 150W/m^2$are shown although the actual range (noted above color bar) is -148.3$W/m^2$ to 1770$W/m^2$. The larger positive values are only for a small number of grid points (mountains of New Guinea). The column-integrated dynamical core TE tendency  $\partial \gi{E}^{(adiab)}$ (Figure \ref{fig:2d_te}c) approximately balances $\partial E^{(param)}$. The TE pressure work error tendency $\partial E^{(pwork)}$ (Figure \ref{fig:2d_te}b) is, as expected, largest where precipitation and evaporation is largest. The last 3 plots show terms in the dynamical core budget: column-integrated TE tendency for hyperviscosity, $\partial \gi{E}^{(hvis)}$, vertical remapping, $\partial \gi{E}^{(remap)}$, and frictional heating, $\partial \gi{E}^{(fheat)}$. Compared to $\partial E^{(param)}$ the hyperviscosity tendencies $\partial \gi{E}^{(hvis)}$ are very large meaning that the frictionless adiabatic dynamical core creates very large TE tendencies (not shown) that are, to a large degree, compensated for by the hyperviscosity operators. Otherwise the total dynamical core TE tendencies would be equally large. The frictional heating TE tendency is largest over/near topography. Similarly for vertical remapping but, in addition, there are large TE tendencies in areas of large updrafts/downdrafts over ocean.
+%
+\begin{figure}[h]
+% \centering
+% when using pdflatex, use pdf file:
+\centering
+ \includegraphics[width=35pc]{te.pdf}
+\caption{{\color{red}{Two-dimensional spatial structure of column-integrated TE tendencies for different terms in the TE tendency budget using the {\em{default}} configuration: Column-integrated (a) $\partial E^{(param)}$, $\partial E^{(pwork)}$, $\partial E^{(adiab)}$, $\partial E^{(hvis)}$, $\partial E^{(remap)}$, and $\partial E^{(fheat)}$. Above each color bar the global minimum and maximum TE tendencies are noted as there a small number of grid points where the TE tendencies are much larger than the color bar range.}}}
+\label{fig:2d_te}
+\end{figure}
+
+
+
+}}
+
 %\subsection{Configuration 3: CMIP6 version}
 %By only including dry air and water vapor   in $\rho$ and setting $c_p^{(wv)}= c_p^{(d)}$ in the equations of motion, the dynamical core (in the absence of truncation errors) will conserve the energy used in CAM physics.'
 
@@ -565,37 +616,6 @@ This configuration was discussed in the context of element noise in section \ref
 In this configuration the energy diagnostics computed in the dynamical core are computed on the quadrature grid and the energy diagnostics computed in physics are on the physics grid. If the TE consistent configuration is used ({\tt{ftype=1}}, {\tt{qsize\_condensate\_loading=1}}, {\tt{lcp\_moist=.false.}}) then the physics-dynamical coupling errors, $\gi{E}^{(pdc)}$ computed with \eqref{eq:pdc}, are entirely due to mapping state from quadrature grid to physics grid and mapping tendencies back the quadrature grid from the physics grid. The results is $\gi{E}^{(pdc)}=-0.07W/m^2$ which is a rather small error compared to other terms in the TE budget.
 
 Due to similar noise problems with CAM-SE-CSLAM when using {\tt{ftype=1}} that were observed in CAM-SE (Figure \ref{fig:abs_dpsdt} and \ref{fig:omega500}), the default version of CAM-SE-CSLAM uses {\tt{ftype=2}}. Again physics-dynamics coupling errors and TE discrepancy errors can not be separated; $\partial \gi{E}^{({pdc})}+\partial \gi{E}^{({discr})} = 0.557W/m^2$.
-
- \begin{sidewaysfigure}
- \centering
- \includegraphics[width=45pc]{abs_dpsdt.pdf}
- \caption{One year average of the absolute surface pressure tendency for (a) the TE consistent configuration, (b) `dribbling' physics-dynamics coupling, (c) {\tt{ftype=2}} physics-dynamics coupling and (d) CSLAM version of CAM-SE, respectively. (a) has a closed physics-dynamics coupling budget but spurious noise, (b) has no spurious noise but the mass-budget in physics-dynamics coupling is not closed (see Figure \ref{fig:pdc}), (c) has a closed mass budget in physics-dynamics coupling but some spurious noise at element boundaries which is eliminated when using CAM-SE-CSLAM (d). Note, the smallest value in panel (a) is the largest in panels (b), (c) and (d).}
- \label{fig:abs_dpsdt}
-  \end{sidewaysfigure}
-
-
- \begin{sidewaysfigure}
- \centering
- \includegraphics[width=45pc]{omega500.pdf}
- \caption{Same as Figure \ref{fig:abs_dpsdt} but for 500hPa vertical pressure velocity. Note the ringing patterns off the West coast of South America and around the Himalayas in CAM-SE (a-c) that are eliminated with CAM-SE-CSLAM (d) that makes use of a quasi equal-area physics grid.}
- \label{fig:omega500}
-  \end{sidewaysfigure}
-
- \begin{figure}[h]
- \centering
- \includegraphics[width=35pc]{ftype_schematic.pdf}
- \caption{A schematic of state-update ({\tt{ftype=1}}; row 1) and `dribbling' ({\tt{ftype=0}}; row 2) physics-dynamics coupling algorithms. See Section \ref{se:pdc_problem} for details.}
- \label{fig:ftype_schematic}
-  \end{figure}
-
-
-
- \begin{sidewaysfigure}
- \centering
- \includegraphics[width=55pc]{pdc.pdf}
- \caption{One year average of mass [$kg/m^2$] `clipped' in physics-dynamics coupling (so that state is not driven negative) when using {\tt{ftype=0}} (`dribbling') physics-dynamics coupling for (a) water vapor, (b) cloud liquid and (c) cloud ice, respectively. Interestingly the element boundaries systematically show in the plots which is likely related to the anisotropy of the quadrature grid \citep{HetAl2018MWR}.}
- \label{fig:pdc}
-  \end{sidewaysfigure}
 
 
 \section{Conclusions}\label{sec:concl}
